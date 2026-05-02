@@ -16,6 +16,7 @@ const routes: AppRouteRecordRaw[] = [
 			order: home,
 			title: $t("common.menu.home"),
 			icon: createElement(HomeOutlined),
+			roles: ["user", "admin"],
 		},
 		children: [
 			{
@@ -24,6 +25,7 @@ const routes: AppRouteRecordRaw[] = [
 				handle: {
 					title: $t("common.menu.home"),
 					icon: createElement(HomeOutlined),
+					roles: ["user", "admin"],
 				},
 			},
 		],

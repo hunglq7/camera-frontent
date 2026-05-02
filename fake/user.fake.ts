@@ -16,13 +16,12 @@ export default defineFakeRoute([
 					avatar: "https://avatars.githubusercontent.com/u/47056890",
 					username: "Admin",
 					email: "<EMAIL>",
-					phoneNumber: "1234567890",
+					phoneNumber: "0982922767",
 					description: "manager",
 					roles: ["admin"],
 					// menus: [systemManagementRouter],
 				});
-			}
-			else {
+			} else {
 				return resultSuccess({
 					id: 2,
 					avatar: "https://avatar.vercel.sh/avatar.svg?text=Common",

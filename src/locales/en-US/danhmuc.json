@@ -1,0 +1,16 @@
+{
+	"mayCaoManagement": "Danh mục máy cao",
+	"mayXucManagement": "Danh mục máy xúc",
+	"tenThietBi": "Tên thiết bị",
+	"loaiThietBi": "Loại thiết bị",
+	"tenThietBiPlaceholder": "Nhập tên thiết bị",
+	"loaiThietBiPlaceholder": "Nhập loại thiết bị",
+	"addMayCao": "Thêm máy cao",
+	"editMayCao": "Sửa máy cao",
+	"addMayXuc": "Thêm máy xúc",
+	"editMayXuc": "Sửa máy xúc",
+	"tenThietBiRequired": "Vui lòng nhập tên thiết bị",
+	"loaiThietBiRequired": "Vui lòng nhập loại thiết bị",
+	"tenThietBiLength": "Tên thiết bị phải từ 2-100 ký tự",
+	"loaiThietBiLength": "Loại thiết bị phải từ 2-100 ký tự"
+}

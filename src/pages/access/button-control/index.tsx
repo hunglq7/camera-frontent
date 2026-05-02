@@ -12,12 +12,12 @@ import { useNavigate } from "react-router";
 
 const accounts: Record<string, LoginInfo> = {
 	[AccessControlRoles.admin]: {
-		password: "123456789admin",
-		username: AccessControlRoles.admin,
+		password: "LeHung@79",
+		username: "hunglq7",
 	},
 	[AccessControlRoles.common]: {
-		password: "123456789admin",
-		username: AccessControlRoles.common,
+		password: "LeHung@79",
+		username: "hunglq7",
 	},
 };
 

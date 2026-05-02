@@ -1,0 +1,22 @@
+{
+	"tenThietBi": "设备名称",
+	"ipAddress": "IP 地址",
+	"location": "安装位置",
+	"status": "状态",
+	"enabled": "已启用",
+	"deactivated": "已停用",
+	"last_check": "最后检查",
+	"maThietBi": "设备编号",
+	"danhmuccamera": "摄像头目录",
+	"scan": "扫描",
+	"scanAll": "检查状态",
+	"scanAllSuccess": "所有摄像头扫描成功",
+	"scanAllFailed": "扫描摄像头失败",
+	"ipRequired": "IP 地址为必填项",
+	"ipDuplicate": "IP 地址已存在",
+	"menu": {
+		"camera": "摄像头",
+		"danhmuc": "目录",
+		"tonghop": "汇总"
+	}
+}

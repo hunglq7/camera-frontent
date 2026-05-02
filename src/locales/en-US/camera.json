@@ -1,0 +1,23 @@
+{
+	"tenThietBi": "Tên thiết bị",
+	"ipAddress": "Địa chỉ IP",
+	"location": "Vị trí lắp đặt",
+	"status": "Trạng thái",
+	"enabled": "Kích hoạt",
+	"deactivated": "Ngừng kích hoạt",
+	"last_check": "Lần kiểm tra cuối",
+	"maThietBi": "Mã thiết bị",
+	"danhmuccamera": "Danh sách camera",
+	"scan": "Quét",
+	"scanAll": "Kiểm tra trạng thái",
+	"scanAllSuccess": "Quét tất cả camera thành công",
+	"scanAllFailed": "Quét camera thất bại",
+	"ipRequired": "IP address is required",
+	"ipDuplicate": "Đia chỉ IP đã tồn tại",
+	"menu": {
+		"camera": "Camera",
+		"danhmuc": "Danh sách camera",
+		"tonghop": "Cập nhật camera"
+	}
+	
+}

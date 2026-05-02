@@ -1,7 +1,13 @@
 /// <reference types="vitest/config" />
 
 import process from "node:process";
-import { cleanupSVG, isEmptyColor, parseColors, runSVGO, SVG } from "@iconify/tools";
+import {
+	cleanupSVG,
+	isEmptyColor,
+	parseColors,
+	runSVGO,
+	SVG,
+} from "@iconify/tools";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { codeInspectorPlugin } from "code-inspector-plugin";
@@ -13,7 +19,14 @@ import { checker } from "vite-plugin-checker";
 import { vitePluginFakeServer } from "vite-plugin-fake-server";
 import svgrPlugin from "vite-plugin-svgr";
 
-import { author, dependencies, devDependencies, license, name, version } from "./package.json";
+import {
+	author,
+	dependencies,
+	devDependencies,
+	license,
+	name,
+	version,
+} from "./package.json";
 
 const __APP_INFO__ = {
 	pkg: { dependencies, devDependencies, name, version, license, author },
@@ -21,15 +34,15 @@ const __APP_INFO__ = {
 };
 
 const isDev = process.env.NODE_ENV === "development";
+const DANHMUC_REWRITE_REGEXP = /^\/danhmuc/;
 
 // https://vitejs.dev/config/
 export default defineConfig({
-
 	base: isDev ? "/" : "/react-antd-admin/",
 	plugins: [
 		vitePluginFakeServer({
 			basename: "/api",
-			enableProd: true,
+			enableProd: false,
 			timeout: 1000,
 		}),
 		// https://github.com/pd4d10/vite-plugin-svgr#options
@@ -84,7 +97,9 @@ export default defineConfig({
 						callback: (attr, colorStr, color) => {
 							if (!color) {
 								// Color cannot be parsed!
-								throw new Error(`Invalid color: "${colorStr}" in attribute ${attr}`);
+								throw new Error(
+									`Invalid color: "${colorStr}" in attribute ${attr}`,
+								);
 							}
 
 							if (isEmptyColor(color)) {
@@ -96,7 +111,7 @@ export default defineConfig({
 							return color;
 						},
 					});
-					return svgObject.toString({ height: "1em", width: "1em" }); ;
+					return svgObject.toString({ height: "1em", width: "1em" });
 				}
 				return svg;
 			},
@@ -117,11 +132,35 @@ export default defineConfig({
 		port: 3333,
 		// https://vitejs.dev/config/server-options#server-proxy
 		proxy: {
-			// "/api": {
-			// 	target: "http://191.255.255.123:8888",
-			// 	changeOrigin: true,
-			// 	rewrite: path => isDev ? path.replace(/^\/api/, "") : path,
-			// },
+			"/auth": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+			},
+			"/cameras": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+			},
+			"/danhmuc": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+				rewrite: (path) => path.replace(DANHMUC_REWRITE_REGEXP, ""),
+			},
+			"/danh-muc-may-cao": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+			},
+			"/danh-muc-may-xuc": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+			},
+			"/tong-hop-camera": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+			},
+			"/upload": {
+				target: "http://192.168.0.110:8000",
+				changeOrigin: true,
+			},
 		},
 	},
 	define: {

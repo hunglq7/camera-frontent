@@ -1,7 +1,6 @@
 import type { RoleItemType } from "#src/api/system/role";
 import type { ProColumns } from "@ant-design/pro-components";
 import type { TFunction } from "i18next";
-
 import { Tag } from "antd";
 
 export function getConstantColumns(t: TFunction<"translation", undefined>): ProColumns<RoleItemType>[] {

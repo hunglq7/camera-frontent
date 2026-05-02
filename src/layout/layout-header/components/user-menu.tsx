@@ -7,11 +7,12 @@ import { useAuthStore } from "#src/store/auth";
 import { useUserStore } from "#src/store/user";
 import { cn } from "#src/utils/cn";
 import { isWindowsOs } from "#src/utils/is-windows-os";
+import { UploadAvatarModal } from "./upload-avatar-modal";
 
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, CameraOutlined } from "@ant-design/icons";
 import { useKeyPress } from "ahooks";
-import { Avatar, Dropdown } from "antd";
-import { useMemo } from "react";
+import { Avatar, Dropdown, Tooltip } from "antd";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -19,7 +20,9 @@ export function UserMenu({ ...restProps }: ButtonProps) {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const avatar = useUserStore(state => state.avatar);
+	const username = useUserStore(state => state.username);
 	const logout = useAuthStore(state => state.logout);
+	const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
 	const onClick: MenuProps["onClick"] = async ({ key }) => {
 		if (key === "logout") {
@@ -29,8 +32,12 @@ export function UserMenu({ ...restProps }: ButtonProps) {
 		if (key === "personal-center") {
 			navigate("/personal-center/my-profile");
 		}
+		if (key === "upload-avatar") {
+			setUploadModalOpen(true);
+		}
 	};
 
+	const avatarSrc = avatar ? (avatar.startsWith("http") ? avatar : `${import.meta.env.VITE_API_BASE_URL}${avatar}`) : undefined;
 	const altView = useMemo(() => isWindowsOs() ? "Alt" : "⌥", [isWindowsOs]);
 	const items: MenuProps["items"] = [
 		{
@@ -38,6 +45,11 @@ export function UserMenu({ ...restProps }: ButtonProps) {
 			key: "personal-center",
 			icon: <RiAccountCircleLine />,
 			extra: `${altView}P`,
+		},
+		{
+			label: "Upload Avatar",
+			key: "upload-avatar",
+			icon: <CameraOutlined />,
 		},
 		{
 			label: t("authority.logout"),
@@ -56,19 +68,24 @@ export function UserMenu({ ...restProps }: ButtonProps) {
 	});
 
 	return (
-		<Dropdown
-			menu={{ items, onClick }}
-			arrow={false}
-			placement="bottomRight"
-			trigger={["click"]}
-		>
-			<BasicButton
-				type="text"
-				{...restProps}
-				className={cn(restProps.className, "rounded-full px-1")}
+		<>
+			<Dropdown
+				menu={{ items, onClick }}
+				arrow={false}
+				placement="bottomRight"
+				trigger={["click"]}
 			>
-				<Avatar src={avatar} />
-			</BasicButton>
-		</Dropdown>
+				<BasicButton
+					type="text"
+					{...restProps}
+					className={cn(restProps.className, "rounded-full px-1")}
+				>
+					<Tooltip title={username} placement="bottom">
+						<Avatar src={avatarSrc} icon={<RiAccountCircleLine />} />
+					</Tooltip>
+				</BasicButton>
+			</Dropdown>
+			<UploadAvatarModal open={uploadModalOpen} onClose={() => setUploadModalOpen(false)} />
+		</>
 	);
 }

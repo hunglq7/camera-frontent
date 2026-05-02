@@ -97,16 +97,14 @@ export default function LayoutMenu({
 		 * 原因：非手风琴模式下打开多个菜单，切换到手风琴模式下，点击菜单项，不会自动关闭其他菜单
 		 */
 		if (accordion || sidebarCollapsed) {
-			// eslint-disable-next-line unicorn/prefer-includes
-			const currentOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
+			const currentOpenKey = keys.find(key => !openKeys.includes(key));
 			// open
 			if (currentOpenKey !== undefined) {
 				const parentKeys = menuParentKeys[currentOpenKey] || [];
 				setOpenKeys([...parentKeys, currentOpenKey]);
 			}
 			else {
-				// eslint-disable-next-line unicorn/prefer-includes
-				const currentCloseKey = openKeys.find(key => keys.indexOf(key) === -1);
+				const currentCloseKey = openKeys.find(key => !keys.includes(key));
 				// close
 				if (currentCloseKey) {
 					setOpenKeys(menuParentKeys[currentCloseKey]);
@@ -135,15 +133,16 @@ export default function LayoutMenu({
 	 * @see https://github.com/user-attachments/assets/df2d7b63-acf4-4faa-bea6-7616b7e69621
 	 */
 	useEffect(() => {
+		let newOpenKeys: string[] = [];
 		// 折叠
 		if (sidebarCollapsed) {
-			setOpenKeys([]);
+			newOpenKeys = [];
 		}
 		// 展开
 		else {
 			// 手风琴模式，只展开当前激活的菜单
 			if (accordion) {
-				setOpenKeys(getSelectedKeys);
+				newOpenKeys = getSelectedKeys;
 			}
 			// 非手风琴模式，展开所有激活的菜单
 			else {
@@ -153,8 +152,10 @@ export default function LayoutMenu({
 					}
 					return prevOpenKeys;
 				});
+				return; // Skip setting directly
 			}
 		}
+		setOpenKeys(newOpenKeys);
 	}, [matches, sidebarCollapsed, getSelectedKeys]);
 
 	return (

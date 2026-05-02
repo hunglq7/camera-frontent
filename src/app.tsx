@@ -150,7 +150,7 @@ export default function App() {
 				<AntdApp>
 					<JSSThemeProvider>
 						<Suspense fallback={null}>
-							{enableCheckUpdates ? <AppVersionMonitor checkUpdatesInterval={checkUpdatesInterval} /> : null}
+							{false && enableCheckUpdates ? <AppVersionMonitor checkUpdatesInterval={checkUpdatesInterval} /> : null}
 							<RouterProvider router={router} />
 						</Suspense>
 					</JSSThemeProvider>

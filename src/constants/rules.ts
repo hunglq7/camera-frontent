@@ -8,6 +8,8 @@ import {
 	USERNAME_REGEXP,
 } from "./regular-expressions";
 
+const PASSWORD_REGEXP = /^(?=.*\d)(?=.*[a-z])[\w~!@#$%^&*+.\-]{8,16}$/i;
+
 export const FORM_REQUIRED = [{ required: true }]; // 表单必填校验
 
 /**
@@ -37,7 +39,7 @@ export function PASSWORD_RULES(t: TFunction<"translation", undefined>) {
 			message: t("form.password.required"),
 		},
 		{
-			pattern: /^(?=.*\d)(?=.*[a-z])[\w~!@#$%^&*+.\-]{8,16}$/i,
+			pattern: PASSWORD_REGEXP,
 			message: t("form.password.invalid"),
 		},
 	];
@@ -47,7 +49,9 @@ export function PASSWORD_RULES(t: TFunction<"translation", undefined>) {
  * 仅允许字母和数字的规则函数
  *
  */
-export function ALPHA_NUMERIC_ONLY_RULES(t: TFunction<"translation", undefined>) {
+export function ALPHA_NUMERIC_ONLY_RULES(
+	t: TFunction<"translation", undefined>,
+) {
 	return [
 		{
 			required: true,
@@ -64,7 +68,9 @@ export function ALPHA_NUMERIC_ONLY_RULES(t: TFunction<"translation", undefined>)
  * 获取统一社会信用代码校验规则
  *
  */
-export function UNIFIED_SOCIAL_CREDIT_CODE_RULES(t: TFunction<"translation", undefined>) {
+export function UNIFIED_SOCIAL_CREDIT_CODE_RULES(
+	t: TFunction<"translation", undefined>,
+) {
 	return [
 		{
 			required: true,
@@ -117,10 +123,43 @@ export function PHONE_RULE(t: TFunction<"translation", undefined>) {
 
 			if (MOBILE_PHONE_REGEXP.test(value) || TELEPHONE_REGEXP.test(value)) {
 				return Promise.resolve();
-			}
-			else {
+			} else {
 				return Promise.reject(t("form.mobile.invalid"));
 			}
 		},
 	};
+}
+
+/**
+ * Tên thiết bị validation rules
+ */
+export function TEN_THIET_BI_RULES(t: TFunction<"translation", undefined>) {
+	return [
+		{
+			required: true,
+			message: t("danhmuc.tenThietBiRequired"),
+		},
+		{
+			min: 2,
+			max: 100,
+			message: t("danhmuc.tenThietBiLength"),
+		},
+	];
+}
+
+/**
+ * Loại thiết bị validation rules
+ */
+export function LOAI_THIET_BI_RULES(t: TFunction<"translation", undefined>) {
+	return [
+		{
+			required: true,
+			message: t("danhmuc.loaiThietBiRequired"),
+		},
+		{
+			min: 2,
+			max: 100,
+			message: t("danhmuc.loaiThietBiLength"),
+		},
+	];
 }

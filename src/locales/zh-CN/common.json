@@ -25,10 +25,14 @@
 		"exception_500": "500",
 		"exceptionUnknownComponent": "未知组件",
 		"system": "系统管理",
-		"user": "用户管理",
-		"role": "角色管理",
+		"bienap": "Biến áp",
+		"role": "Rơ le",
+		"danhmuc": "Danh mục thiết bị",
+		"maycao": "Máy cao",
+		"mayxuc": "Máy xúc",
 		"menu": "菜单管理",
 		"dept": "部门管理",
+		"phongban": "Phongban管理",
 		"personalCenter": "个人中心",
 		"profile": "我的资料",
 		"settings": "设置"
@@ -53,8 +57,13 @@
 	"add": "新增",
 	"addSuccess": "添加成功",
 	"backToHome": "返回首页",
-	"batchDelete": "批量删除",
+	"batchDelete": "Xóa dòng chọn",
+	"selectedRows": "已选择 {{count}} 项",
 	"cancel": "取消",
+	"exportExcel": "Export Excel",
+	"exportSuccess": "导出成功",
+	"exportFailed": "导出失败",
+	"save": "保存",
 	"close": "关闭",
 	"check": "勾选",
 	"expandColumn": "展开列",
@@ -91,5 +100,9 @@
 	"expandAll": "展开所有",
 	"collapseAll": "折叠所有",
 	"checkAll": "选择所有",
-	"cancelAll": "取消所有"
+	"cancelAll": "取消所有",
+	"all": "所有",
+	"clear": "清空",
+	"items": "项"
+	
 }

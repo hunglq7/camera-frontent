@@ -6,9 +6,9 @@ import { useMatches } from "react-router";
 export function Iframe() {
 	const matches = useMatches();
 	const { t } = useTranslation();
-	const currentRoute = matches[matches.length - 1];
-	const iframeLink = currentRoute.handle?.iframeLink;
-	const routeTitle = currentRoute.handle?.title;
+	const currentRoute = matches.at(-1);
+	const iframeLink = currentRoute?.handle?.iframeLink;
+	const routeTitle = currentRoute?.handle?.title;
 
 	let title: string;
 	if (isValidElement(routeTitle)) {

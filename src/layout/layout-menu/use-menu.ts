@@ -7,12 +7,17 @@ import { useAccessStore } from "#src/store/access";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatches, useNavigate } from "react-router";
-
 import { useLayout } from "../hooks";
-import { findDeepestFirstItem, findRootMenuByPath, translateMenus } from "./utils";
+import {
+	findDeepestFirstItem,
+	findRootMenuByPath,
+	translateMenus,
+} from "./utils";
+
+const HTTP_URL_REGEX = /https?:/;
 
 export function useMenu() {
-	const wholeMenus = useAccessStore(state => state.wholeMenus);
+	const wholeMenus = useAccessStore((state) => state.wholeMenus);
 	const { isMixedNav, isTwoColumnNav } = useLayout();
 	const navigate = useNavigate();
 	const { t } = useTranslation();
@@ -32,32 +37,32 @@ export function useMenu() {
 	 * 混合导航模式下，侧边导航的顶级菜单 key
 	 */
 	const sideNavMenuKeyInSplitMode = useMemo(() => {
-		if (!shouldSplitMenuItems)
-			return "";
+		if (!shouldSplitMenuItems) return "";
 
 		// Try to find active menu from currentActiveMenu first
-		const activeMenuPath = matches.findLast(routeItem =>
-			routeItem.handle?.currentActiveMenu,
+		const activeMenuPath = matches.findLast(
+			(routeItem) => routeItem.handle?.currentActiveMenu,
 		)?.handle?.currentActiveMenu;
 
 		// Fallback to current pathname if no currentActiveMenu found
-		const targetPath = activeMenuPath ? removeTrailingSlash(activeMenuPath) : removeTrailingSlash(pathname);
+		const targetPath = activeMenuPath
+			? removeTrailingSlash(activeMenuPath)
+			: removeTrailingSlash(pathname);
 
 		const { rootMenuPath } = findRootMenuByPath(translatedMenus, targetPath);
 		return rootMenuPath ?? "";
 	}, [shouldSplitMenuItems, pathname, matches]);
 
 	/* 混合菜单模式下需要拆分 menu 的 items */
-	const splitSideNavItems = useMemo(
-		() => {
-			const foundMenu = translatedMenus.find(item => item?.key === sideNavMenuKeyInSplitMode);
-			if (!foundMenu) {
-				return [];
-			}
-			return foundMenu?.children ?? [foundMenu];
-		},
-		[sideNavMenuKeyInSplitMode, translatedMenus],
-	);
+	const splitSideNavItems = useMemo(() => {
+		const foundMenu = translatedMenus.find(
+			(item) => item?.key === sideNavMenuKeyInSplitMode,
+		);
+		if (!foundMenu) {
+			return [];
+		}
+		return foundMenu?.children ?? [foundMenu];
+	}, [sideNavMenuKeyInSplitMode, translatedMenus]);
 
 	/**
 	 * 头部菜单
@@ -91,23 +96,19 @@ export function useMenu() {
 		}
 		/* 1. 非混合导航模式 2. 混合导航模式下的侧边导航 */
 		if (!shouldSplitMenuItems || mode !== "horizontal") {
-			// eslint-disable-next-line regexp/no-unused-capturing-group
-			if (/http(s)?:/.test(key)) {
+			if (HTTP_URL_REGEX.test(key)) {
 				window.open(key);
-			}
-			else {
+			} else {
 				navigate(key);
 			}
-		}
-		else {
+		} else {
 			/* 混合导航模式下的顶部导航 */
-			const rootMenu = translatedMenus.find(item => item?.key === key);
+			const rootMenu = translatedMenus.find((item) => item?.key === key);
 			const targetMenu = findDeepestFirstItem(rootMenu?.children ?? []);
 			/* 点击顶部的导航默认跳转到菜单下的第一个子项 */
 			if (!targetMenu) {
 				navigate(key);
-			}
-			else {
+			} else {
 				navigate(targetMenu.key);
 			}
 		}

@@ -23,7 +23,9 @@ export function AntdApp({ children }: AntdAppProps) {
 	return (
 		<App className="h-full">
 			<StaticAntd />
-			{children}
+			<div className="h-full">
+				{children}
+			</div>
 		</App>
 	);
 }

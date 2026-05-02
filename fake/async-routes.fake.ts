@@ -1,4 +1,12 @@
-import { about, access, home, outside, personalCenter, routeNest, system } from "#/src/router/extra-info";
+import {
+	about,
+	access,
+	home,
+	outside,
+	personalCenter,
+	routeNest,
+	system,
+} from "#/src/router/extra-info";
 import { defineFakeRoute } from "vite-plugin-fake-server/client";
 import { ADMIN_TOKEN } from "./constants";
 import { resultSuccess } from "./utils";
@@ -61,6 +69,21 @@ const systemManagementRouter = {
 			},
 		},
 		{
+			path: "/system/bienap",
+			component: "/system/menu/index.tsx",
+			handle: {
+				icon: "MenuOutlined",
+				title: "common.menu.menu",
+				roles: ["admin"],
+				permissions: [
+					"permission:button:add",
+					"permission:button:update",
+					"permission:button:delete",
+				],
+			},
+		},
+
+		{
 			path: "/system/dept",
 			component: "/system/dept/index.tsx",
 			handle: {
@@ -88,7 +111,7 @@ const homeRouter = {
 	},
 };
 
-const aboutRouter = {
+const _aboutRouter = {
 	path: "/about",
 	component: "/about/index.tsx",
 	handle: {
@@ -98,7 +121,7 @@ const aboutRouter = {
 	},
 };
 
-const outsideRouter = {
+const _outsideRouter = {
 	path: "/outside",
 	handle: {
 		icon: "OutsidePageIcon",
@@ -126,7 +149,8 @@ const outsideRouter = {
 					handle: {
 						icon: "ContainerOutlined",
 						title: "common.menu.projectDocs",
-						iframeLink: "https://condorheroblog.github.io/react-antd-admin/docs/",
+						iframeLink:
+							"https://condorheroblog.github.io/react-antd-admin/docs/",
 					},
 				},
 			],
@@ -151,7 +175,7 @@ const outsideRouter = {
 	],
 };
 
-const personalCenterRouter = {
+const _personalCenterRouter = {
 	path: "/personal-center",
 	handle: {
 		order: personalCenter,
@@ -176,7 +200,7 @@ const personalCenterRouter = {
 	],
 };
 
-const routeNestRouter = {
+const _routeNestRouter = {
 	path: "/route-nest",
 	handle: {
 		order: routeNest,
@@ -195,14 +219,14 @@ const routeNestRouter = {
 					path: "/route-nest/menu1/menu1-1",
 					handle: {
 						title: "common.menu.menu1-1",
-						icon: ("SubnodeOutlined"),
+						icon: "SubnodeOutlined",
 					},
 				},
 				{
 					path: "/route-nest/menu1/menu1-2",
 					handle: {
 						title: "common.menu.menu1-2",
-						icon: ("SubnodeOutlined"),
+						icon: "SubnodeOutlined",
 					},
 				},
 			],
@@ -225,7 +249,7 @@ export default defineFakeRoute([
 		response: ({ headers }) => {
 			const userToken = headers.authorization?.split(" ")?.[1];
 			const isAdmin = userToken === ADMIN_TOKEN;
-			const accessRouter = {
+			const _accessRouter = {
 				path: "/access",
 				handle: {
 					icon: "SafetyOutlined",
@@ -258,44 +282,40 @@ export default defineFakeRoute([
 							title: "common.menu.buttonControl",
 							permissions: isAdmin
 								? [
-									"permission:button:get",
-									"permission:button:update",
-									"permission:button:delete",
-									"permission:button:add",
-								]
-								: [
-									"permission:button:get",
-								],
+										"permission:button:get",
+										"permission:button:update",
+										"permission:button:delete",
+										"permission:button:add",
+									]
+								: ["permission:button:get"],
 						},
 					},
 					isAdmin
 						? {
-							path: "/access/admin-visible",
-							handle: {
-								icon: "EyeOutlined",
-								title: "common.menu.adminVisible",
-							},
-						}
+								path: "/access/admin-visible",
+								handle: {
+									icon: "EyeOutlined",
+									title: "common.menu.adminVisible",
+								},
+							}
 						: {
-							path: "/access/common-visible",
-							handle: {
-								icon: "EyeOutlined",
-								title: "common.menu.commonVisible",
+								path: "/access/common-visible",
+								handle: {
+									icon: "EyeOutlined",
+									title: "common.menu.commonVisible",
+								},
 							},
-						},
 				],
 			};
-			return resultSuccess(
-				[
-					homeRouter,
-					accessRouter,
-					aboutRouter,
-					systemManagementRouter,
-					outsideRouter,
-					personalCenterRouter,
-					routeNestRouter,
-				],
-			);
+			return resultSuccess([
+				homeRouter,
+				// accessRouter,
+				// aboutRouter,
+				systemManagementRouter,
+				// outsideRouter,
+				// personalCenterRouter,
+				// routeNestRouter,
+			]);
 		},
 	},
 ]);

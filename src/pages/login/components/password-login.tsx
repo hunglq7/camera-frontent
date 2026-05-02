@@ -18,8 +18,8 @@ import { useNavigate, useSearchParams } from "react-router";
 import { FormModeContext } from "../form-mode-context";
 
 const FORM_INITIAL_VALUES: LoginInfo = {
-	username: "admin",
-	password: "123456789admin",
+	username: "hunglq7",
+	password: "LeHung@79",
 };
 
 export function PasswordLogin() {
@@ -40,12 +40,17 @@ export function PasswordLogin() {
 			messageLoadingApi?.destroy();
 			window.$message?.success(t("authority.loginSuccess"));
 			const redirect = searchParams.get("redirect");
+
 			if (redirect) {
 				navigate(`/${redirect.slice(1)}`);
 			}
-			else {
-				navigate(import.meta.env.VITE_BASE_HOME_PATH);
-			}
+			// else {
+			// 	navigate(import.meta.env.VITE_BASE_HOME_PATH);
+			// }
+		}).catch((error) => {
+			messageLoadingApi?.destroy();
+			console.error("Login failed:", error);
+			window.$message?.error(t("authority.loginFailed"));
 		}).finally(() => {
 			messageLoadingApi?.destroy();
 			// Prevent multiple requests from being made by clicking the login button
@@ -80,7 +85,7 @@ export function PasswordLogin() {
 				<Form.Item
 					label={t("authority.username")}
 					name="username"
-					rules={USERNAME_RULES(t)}
+					rules={[{ required: true, message: t("form.username.required") }]}
 				>
 					<Input placeholder={t("form.username.required")} />
 				</Form.Item>

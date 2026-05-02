@@ -1,0 +1,358 @@
+import { DanhmucCameraItemType } from "#src/api/camera/danhmuc/types";
+import type { ActionType, ProColumns, ProCoreActionType } from "@ant-design/pro-components";
+import {
+    fetchDanhmucCamerasList,
+    fetchDeleteDanhMucCameraItem,
+    fetchScanDanhMucCameraItem,
+    fetchImportDanhMucCamera,
+    fetchDownloadDanhmucCameraTemplate,
+} from "#src/api/camera/danhmuc/index";
+import { BasicButton } from "#src/components/basic-button";
+import { BasicContent } from "#src/components/basic-content";
+import { BasicTable } from "#src/components/basic-table";
+import { PlusCircleOutlined, UploadOutlined, DeleteOutlined, ScanOutlined, ClearOutlined } from "@ant-design/icons";
+import { Button, Popconfirm, Upload, Input, Select, Card, Row, Col } from "antd";
+import * as XLSX from "xlsx";
+import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAccess } from "#src/hooks/use-access";
+import { Detail } from "./component/detail";
+import { getConstantColumns } from "./constants";
+import { useEffect } from "react";
+
+export default function DanhMucCamera() {
+    const { t } = useTranslation();
+    const [isOpen, setIsOpen] = useState(false);
+    const [title, setTitle] = useState("");
+    const [detailData, setDetailData] = useState<Partial<DanhmucCameraItemType>>({});
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [importing, setImporting] = useState(false);
+    const [searchName, setSearchName] = useState("");
+    const [searchIp, setSearchIp] = useState("");
+    const [searchLocation, setSearchLocation] = useState("");
+    const [searchStatus, setSearchStatus] = useState<boolean | null>(null);
+    const actionRef = useRef<ActionType>(null);
+
+    const handleImportExcel = async (file: File) => {
+        setImporting(true);
+        try {
+            await fetchImportDanhMucCamera(file);
+            window.$message?.success(t("common.uploadSuccess") || "Import successful");
+            await actionRef.current?.reload?.();
+        } catch (error) {
+            console.error("Import failed", error);
+            window.$message?.error(t("common.uploadFailed") || "Import failed");
+        } finally {
+            setImporting(false);
+        }
+    };
+
+    const handleDownloadTemplate = async () => {
+        try {
+            const blob = await fetchDownloadDanhmucCameraTemplate();
+            const url = window.URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = "camera_template.xlsx";
+            anchor.click();
+            window.URL.revokeObjectURL(url);
+            window.$message?.success(t("common.downloadSuccess") || "Template downloaded");
+        } catch (error) {
+            console.error("Template download failed", error);
+            window.$message?.error(t("common.downloadFailed") || "Download failed");
+        }
+    };
+
+    const handleUploadFile = (file: File) => {
+        handleImportExcel(file);
+        return false;
+    };
+
+    const handleDeleteRow = async (id: number, action?: ProCoreActionType<object>) => {
+        await fetchDeleteDanhMucCameraItem(id);
+        setSelectedRowKeys([]);
+        await action?.reload?.();
+        window.$message?.success(t("common.deleteSuccess"));
+    };
+
+    const handleScanAllCameras = async () => {
+        try {
+            const cameras = await fetchDanhmucCamerasList();
+            const scanPromises = cameras.map((camera) =>
+                fetchScanDanhMucCameraItem(camera.id!)
+            );
+
+            await Promise.all(scanPromises);
+            window.$message?.success(t("camera.scanAllSuccess") || "All cameras scanned successfully");
+            await actionRef.current?.reload?.();
+        } catch (error) {
+            console.error("Scan all cameras failed", error);
+            window.$message?.error(t("camera.scanAllFailed") || "Failed to scan cameras");
+        }
+    };
+
+    const handleDeleteMultiple = async () => {
+        try {
+            const deletePromises = selectedRowKeys.map((key) =>
+                fetchDeleteDanhMucCameraItem(key as number)
+            );
+            await Promise.all(deletePromises);
+            window.$message?.success(
+                t("common.deleteSuccess") || `Successfully deleted ${selectedRowKeys.length} items`
+            );
+            setSelectedRowKeys([]);
+            await actionRef.current?.reload?.();
+        } catch (error) {
+            console.error("Delete multiple failed", error);
+            window.$message?.error(t("common.deleteFailed") || "Failed to delete items");
+        }
+    };
+
+    const filterCameras = (cameras: DanhmucCameraItemType[]): DanhmucCameraItemType[] => {
+        return cameras.filter((camera) => {
+            const matchName = searchName === "" || (camera.name?.toLowerCase().includes(searchName.toLowerCase()) ?? false);
+            const matchIp = searchIp === "" || (camera.ip_address?.toLowerCase().includes(searchIp.toLowerCase()) ?? false);
+            const matchLocation = searchLocation === "" || (camera.location?.toLowerCase().includes(searchLocation.toLowerCase()) ?? false);
+            const matchStatus = searchStatus === null || camera.is_online === searchStatus;
+
+            return matchName && matchIp && matchLocation && matchStatus;
+        });
+    };
+
+    const handleClearFilters = () => {
+        setSearchName("");
+        setSearchIp("");
+        setSearchLocation("");
+        setSearchStatus(null);
+        actionRef.current?.reload?.();
+    };
+
+    // Reload table when search filters change
+    useEffect(() => {
+        actionRef.current?.reload?.();
+    }, [searchName, searchIp, searchLocation, searchStatus]);
+
+    const handleExportExcel = async () => {
+        try {
+            const data = await fetchDanhmucCamerasList();
+            const exportData = data.map((item, index) => ({
+                STT: index + 1,
+                "Tên thiết bị": item.name,
+                "Địa chỉ IP": item.ip_address,
+                "Vị trí lắp đặt": item.location,
+                "Trạng thái": item.is_online ? t("camera.enabled") : t("camera.deactivated"),
+                "Lần kiểm tra cuối": item.last_check,
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData, {
+                header: ["STT", "Tên thiết bị", "Địa chỉ IP", "Vị trí lắp đặt", "Trạng thái", "Lần kiểm tra cuối"],
+            });
+            worksheet["!cols"] = [{ wch: 5 }, { wch: 25 }, { wch: 25 }, { wch: 30 }, { wch: 15 }, { wch: 25 }];
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "DanhMucCamera");
+            XLSX.writeFile(workbook, "danh_muc_camera.xlsx");
+            window.$message?.success(t("common.exportSuccess"));
+        } catch (error) {
+            console.error("Export failed", error);
+            window.$message?.error(t("common.exportFailed"));
+        }
+    };
+
+    const columns: ProColumns<DanhmucCameraItemType>[] = [
+        ...getConstantColumns(t),
+        {
+            title: t("common.action"),
+            valueType: "option",
+            key: "option",
+            width: 220,
+            fixed: "right",
+            render: (_, record, __, action) => [
+                <BasicButton
+                    key="editable"
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      
+                        setIsOpen(true);
+                        setTitle(t("common.edit"));
+                        setDetailData(record);
+                        console.warn('detailData set to:', record);
+                    }}
+                >
+                    {t("common.edit")}
+                </BasicButton>,
+                <Popconfirm
+                    key="delete"
+                    title={t("common.confirmDelete")}
+                    onConfirm={() => handleDeleteRow(record.id!, action)}
+                    okText={t("common.confirm")}
+                    cancelText={t("common.cancel")}
+                >
+                    <BasicButton type="link" size="small" danger>
+                        {t("common.delete")}
+                    </BasicButton>
+                </Popconfirm>,
+            ],
+        },
+    ];
+
+    return (
+        <BasicContent>
+            <Card style={{ marginBottom: 16 }}>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={12} md={6}>
+                        <label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>
+                            {t("camera.tenThietBi")}
+                        </label>
+                        <Input
+                            placeholder={t("common.search")}
+                            value={searchName}
+                            onChange={(e) => setSearchName(e.target.value)}
+                            allowClear
+                        />
+                    </Col>
+                    <Col xs={24} sm={12} md={6}>
+                        <label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>
+                            {t("camera.ipAddress")}
+                        </label>
+                        <Input
+                            placeholder={t("common.search")}
+                            value={searchIp}
+                            onChange={(e) => setSearchIp(e.target.value)}
+                            allowClear
+                        />
+                    </Col>
+                    <Col xs={24} sm={12} md={6}>
+                        <label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>
+                            {t("camera.location")}
+                        </label>
+                        <Input
+                            placeholder={t("common.search")}
+                            value={searchLocation}
+                            onChange={(e) => setSearchLocation(e.target.value)}
+                            allowClear
+                        />
+                    </Col>
+                    <Col xs={24} sm={12} md={6}>
+                        <label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>
+                            {t("camera.status")}
+                        </label>
+                        <Select
+                            placeholder={t("common.all")}
+                            value={searchStatus}
+                            onChange={(value) => setSearchStatus(value)}
+                            options={[
+                                { label: t("common.all"), value: null },
+                                { label: t("camera.enabled"), value: true },
+                                { label: t("camera.deactivated"), value: false },
+                            ]}
+                            allowClear
+                        />
+                    </Col>
+                </Row>
+                <Row style={{ marginTop: 12, justifyContent: "flex-end" }}>
+                    <Button
+                        icon={<ClearOutlined />}
+                        onClick={handleClearFilters}
+                    >
+                        {t("common.clear")}
+                    </Button>
+                </Row>
+            </Card>
+
+            <BasicTable<DanhmucCameraItemType>
+                headerTitle={t("camera.danhmuccamera")}
+                actionRef={actionRef}
+                rowKey="id"
+                search={false}
+                columns={columns}
+                request={async () => {
+                    const data = await fetchDanhmucCamerasList();
+                    const filteredData = filterCameras(data);
+                    return {
+                        data: filteredData,
+                        success: true,
+                        total: filteredData.length,
+                    };
+                }}
+                rowSelection={{
+                    selectedRowKeys,
+                    onChange: setSelectedRowKeys,
+                }}
+                toolBarRender={() => {
+                    const toolbarItems = [
+                        <BasicButton
+                            key="add"
+                            type="primary"
+                            icon={<PlusCircleOutlined />}
+                            onClick={() => {
+                                setIsOpen(true);
+                                setTitle(t("common.add"));
+                                setDetailData({});
+                            }}
+                        >
+                            {t("common.add")}
+                        </BasicButton>,
+                        <BasicButton
+                            key="scanAll"
+                            type="default"
+                            icon={<ScanOutlined />}
+                            onClick={handleScanAllCameras}
+                            style={{ marginLeft: 8 }}
+                        >
+                            {t("camera.scanAll") || "Check Status"}
+                        </BasicButton>,
+                        <Button key="template" onClick={handleDownloadTemplate}>
+                            {t("download Template") || "Download Template"}
+                        </Button>,
+                        <Upload
+                            accept=".xlsx,.xls"
+                            showUploadList={false}
+                            beforeUpload={handleUploadFile}
+                            disabled={importing}
+                        >
+                            <Button key="import" icon={<UploadOutlined />} loading={importing}>
+                                {t("import excel") || "Import Excel"}
+                            </Button>
+                        </Upload>,
+                        <Button key="export" onClick={handleExportExcel}>
+                            {t("common.export")}
+                        </Button>,
+                    ];
+
+                    // Add delete multiple button if items are selected
+                    if (selectedRowKeys.length > 0) {
+                        toolbarItems.splice(2, 0, (
+                            <Popconfirm
+                                key="deleteMultiple"
+                                title={t("common.confirmDelete")}
+                                description={`${t("common.delete")} ${selectedRowKeys.length} ${t("common.items") || "items"}?`}
+                                onConfirm={handleDeleteMultiple}
+                                okText={t("common.confirm")}
+                                cancelText={t("common.cancel")}
+                            >
+                                <Button
+                                    key="deleteBtn"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                >
+                                    {t("common.delete")} ({selectedRowKeys.length})
+                                </Button>
+                            </Popconfirm>
+                        ));
+                    }
+
+                    return toolbarItems;
+                }}
+            />
+
+            <Detail
+                open={isOpen}
+                title={title}
+                treeData={[]}
+                detailData={detailData}
+                onCloseChange={() => setIsOpen(false)}
+                refreshTable={() => actionRef.current?.reload?.()}
+            />
+        </BasicContent>
+    );
+}
