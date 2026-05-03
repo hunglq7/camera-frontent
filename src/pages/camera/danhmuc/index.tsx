@@ -341,7 +341,9 @@ export default function DanhMucCamera() {
 
 					// Add delete multiple button if items are selected
 					if (selectedRowKeys.length > 0) {
-						toolbarItems.splice(2, 0,
+						toolbarItems.splice(
+							2,
+							0,
 							<Popconfirm
 								key="deleteMultiple"
 								title={t("common.confirmDelete")}
