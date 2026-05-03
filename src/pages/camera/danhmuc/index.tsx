@@ -341,15 +341,15 @@ export default function DanhMucCamera() {
 
 					// Add delete multiple button if items are selected
 					if (selectedRowKeys.length > 0) {
-						toolbarItems.splice(2, 0, (
-<Popconfirm
+						toolbarItems.splice(2, 0,
+							<Popconfirm
 								key="deleteMultiple"
 								title={t("common.confirmDelete")}
 								description={`${t("common.delete")} ${selectedRowKeys.length} ${t("common.items") || "items"}?`}
 								onConfirm={handleDeleteMultiple}
 								okText={t("common.confirm")}
 								cancelText={t("common.cancel")}
->
+							>
 								<Button
 									key="deleteBtn"
 									danger
@@ -362,7 +362,7 @@ export default function DanhMucCamera() {
 									)
 								</Button>
 							</Popconfirm>
-));
+						);
 					}
 
 					return toolbarItems;

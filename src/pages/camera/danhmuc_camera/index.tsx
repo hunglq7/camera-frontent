@@ -61,11 +61,11 @@ export default function DanhMucCamera() {
 	const filterCameras = (cameras: DanhMucCameraItemType[]): DanhMucCameraItemType[] => {
 		return cameras.filter((camera) => {
 			const matchTenThietBi = searchTenThietBi === ""
-			  || (camera.ten_thiet_bi?.toLowerCase().includes(searchTenThietBi.toLowerCase()) ?? false);
+				|| (camera.ten_thiet_bi?.toLowerCase().includes(searchTenThietBi.toLowerCase()) ?? false);
 			const matchHangSanXuat = searchHangSanXuat === ""
-			  || (camera.hang_san_xuat?.toLowerCase().includes(searchHangSanXuat.toLowerCase()) ?? false);
+				|| (camera.hang_san_xuat?.toLowerCase().includes(searchHangSanXuat.toLowerCase()) ?? false);
 			const matchNuocSanXuat = searchNuocSanXuat === ""
-			  || (camera.nuoc_san_xuat?.toLowerCase().includes(searchNuocSanXuat.toLowerCase()) ?? false);
+				|| (camera.nuoc_san_xuat?.toLowerCase().includes(searchNuocSanXuat.toLowerCase()) ?? false);
 
 			return matchTenThietBi && matchHangSanXuat && matchNuocSanXuat;
 		});
