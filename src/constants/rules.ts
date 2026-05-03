@@ -123,7 +123,8 @@ export function PHONE_RULE(t: TFunction<"translation", undefined>) {
 
 			if (MOBILE_PHONE_REGEXP.test(value) || TELEPHONE_REGEXP.test(value)) {
 				return Promise.resolve();
-			} else {
+			}
+			else {
 				return Promise.reject(t("form.mobile.invalid"));
 			}
 		},
@@ -160,6 +161,23 @@ export function LOAI_THIET_BI_RULES(t: TFunction<"translation", undefined>) {
 			min: 2,
 			max: 100,
 			message: t("danhmuc.loaiThietBiLength"),
+		},
+	];
+}
+
+/**
+ * Tên đơn vị validation rules
+ */
+export function TEN_DON_VI_RULES(t: TFunction<"translation", undefined>) {
+	return [
+		{
+			required: true,
+			message: t("danhmuc.tenDonViRequired"),
+		},
+		{
+			min: 2,
+			max: 100,
+			message: t("danhmuc.tenDonViLength"),
 		},
 	];
 }

@@ -21,7 +21,8 @@ export default defineFakeRoute([
 					roles: ["admin"],
 					// menus: [systemManagementRouter],
 				});
-			} else {
+			}
+			else {
 				return resultSuccess({
 					id: 2,
 					avatar: "https://avatar.vercel.sh/avatar.svg?text=Common",

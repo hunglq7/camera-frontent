@@ -10,7 +10,7 @@ export function useCurrentRoute() {
 	const matches = useMatches();
 
 	const currentRoute = useMemo(() => {
-		const match = matches[matches.length - 1];
+		const match = matches.at(-1);
 
 		return match;
 	}, [matches, location]);

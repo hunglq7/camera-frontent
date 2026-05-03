@@ -4,7 +4,7 @@ import Icon from "@ant-design/icons";
 import { createElement } from "react";
 
 interface SvgModule {
-	default: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	default: React.ComponentType<React.SVGProps<SVGSVGElement>>
 }
 
 // Eagerly load all SVG files in the svg directory

@@ -21,10 +21,10 @@ const initialState = {
 type AuthState = AuthType;
 
 interface AuthAction {
-	login: (loginPayload: LoginInfo) => Promise<void>;
-	register: (registerPayload: UserRegisterPayload) => Promise<void>;
-	logout: () => Promise<void>;
-	reset: () => void;
+	login: (loginPayload: LoginInfo) => Promise<void>
+	register: (registerPayload: UserRegisterPayload) => Promise<void>
+	logout: () => Promise<void>
+	reset: () => void
 }
 
 export const useAuthStore = create<AuthState & AuthAction>()(
@@ -55,7 +55,8 @@ export const useAuthStore = create<AuthState & AuthAction>()(
 
 				try {
 					await fetchLogout();
-				} catch (error) {
+				}
+				catch (error) {
 					console.warn("logout failed", error);
 				}
 

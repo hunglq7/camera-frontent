@@ -7,14 +7,14 @@ import { useAuthStore } from "#src/store/auth";
 import { useUserStore } from "#src/store/user";
 import { cn } from "#src/utils/cn";
 import { isWindowsOs } from "#src/utils/is-windows-os";
-import { UploadAvatarModal } from "./upload-avatar-modal";
+import { CameraOutlined, LogoutOutlined } from "@ant-design/icons";
 
-import { LogoutOutlined, CameraOutlined } from "@ant-design/icons";
 import { useKeyPress } from "ahooks";
 import { Avatar, Dropdown, Tooltip } from "antd";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+import { UploadAvatarModal } from "./upload-avatar-modal";
 
 export function UserMenu({ ...restProps }: ButtonProps) {
 	const navigate = useNavigate();

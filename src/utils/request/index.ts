@@ -33,7 +33,7 @@ const defaultConfig: Options = {
 					globalProgress.start();
 				}
 				// 不需要携带 token 的请求
-				const isWhiteRequest = requestWhiteList.some((url) =>
+				const isWhiteRequest = requestWhiteList.some(url =>
 					request.url.endsWith(url),
 				);
 				if (!isWhiteRequest) {
@@ -49,44 +49,77 @@ const defaultConfig: Options = {
 				);
 			},
 		],
+		beforeError: [
+			(error) => {
+				// For errors, we need to check if loading should be ignored
+				// Since error.request doesn't have options, we'll always stop loading
+				// as beforeError is only called on errors, and beforeRequest would have started it
+				globalProgress.done();
+				return error;
+			},
+		],
 		afterResponse: [
 			async (request, options, response) => {
-				const ignoreLoading = options.ignoreLoading;
-				if (!ignoreLoading) {
-					globalProgress.done();
-				}
-				// request error
-				if (!response.ok) {
-					if (response.status === 401) {
-						// 防止刷新 refresh-token 继续接收到的 401 错误，出现死循环
-						if (
-							[`/${REFRESH_TOKEN_PATH}`].some((url) =>
-								request.url.endsWith(url),
-							)
-						) {
-							goLogin();
-							return response;
-						}
-						// If the token is expired, refresh it and try again.
-						const { refreshToken } = useAuthStore.getState();
-						// If there is no refresh token, it means that the user has not logged in.
-						if (!refreshToken) {
-							// 如果页面的路由已经重定向到登录页，则不用跳转直接返回结果
-							if (location.pathname === loginPath) {
+				try {
+					const ignoreLoading = options.ignoreLoading;
+					if (!ignoreLoading) {
+						globalProgress.done();
+					}
+					// request error
+					if (!response.ok) {
+						if (response.status === 401) {
+							// 防止刷新 refresh-token 继续接收到的 401 错误，出现死循环
+							if (
+								[`/${REFRESH_TOKEN_PATH}`].some(url =>
+									request.url.endsWith(url),
+								)
+							) {
+								goLogin();
 								return response;
-							} else {
+							}
+							// If the token is expired, refresh it and try again.
+							const { refreshToken } = useAuthStore.getState();
+							// If there is no refresh token, it means that the user has not logged in.
+							if (!refreshToken) {
+								// 如果页面的路由已经重定向到登录页，则不用跳转直接返回结果
+								if (location.pathname === loginPath) {
+									return response;
+								}
+								else {
+									goLogin();
+									return response;
+								}
+							}
+
+							try {
+								return await refreshTokenAndRetry(
+									request,
+									options,
+									refreshToken,
+								);
+							}
+							catch (refreshError) {
+								console.error("Token refresh failed:", refreshError);
 								goLogin();
 								return response;
 							}
 						}
-
-						return refreshTokenAndRetry(request, options, refreshToken);
-					} else {
-						return handleErrorResponse(response);
+						else {
+							return handleErrorResponse(response);
+						}
 					}
+					// request success
+					return response;
 				}
-				// request success
-				return response;
+				catch (error) {
+					// Ensure loading is stopped even if there's an error
+					const ignoreLoading = options.ignoreLoading;
+					if (!ignoreLoading) {
+						globalProgress.done();
+					}
+					console.error("Request error:", error);
+					throw error;
+				}
 			},
 		],
 	},

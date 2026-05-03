@@ -13,7 +13,7 @@ export * from "./constants";
 export function useAccess() {
 	const matches = useMatches();
 	const { roles: userRoles } = useUserStore();
-	const currentRoute = matches[matches.length - 1];
+	const currentRoute = matches.at(-1);
 
 	/**
 	 * @zh 根据权限代码判断当前路由是否具有指定权限

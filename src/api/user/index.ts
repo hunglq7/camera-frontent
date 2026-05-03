@@ -1,9 +1,9 @@
 import type {
 	LoginInfo,
-	UserRegisterPayload,
 	UserInfoType,
 	UserItemType,
 	UserListResponse,
+	UserRegisterPayload,
 	UserSavePayload,
 	UserUpdatePayload,
 } from "./types";
@@ -30,19 +30,19 @@ export * from "./types";
 
 export function fetchLogin(data: LoginInfo) {
 	return request.post("auth/login", { json: data }).json<{
-		access_token: string;
-		refresh_token: string;
-		token_type: string;
-		user_id: number;
+		access_token: string
+		refresh_token: string
+		token_type: string
+		user_id: number
 	}>();
 }
 
 export function fetchRegister(data: UserRegisterPayload) {
 	return request.post("auth/register", { json: data }).json<{
-		access_token: string;
-		refresh_token: string;
-		token_type: string;
-		user_id: number;
+		access_token: string
+		refresh_token: string
+		token_type: string
+		user_id: number
 	}>();
 }
 
@@ -67,7 +67,7 @@ export function fetchUserInfo(): UserInfoType {
 		const jsonPayload = decodeURIComponent(
 			atob(base64)
 				.split("")
-				.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+				.map(c => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
 				.join(""),
 		);
 		const decoded = JSON.parse(jsonPayload);
@@ -85,17 +85,18 @@ export function fetchUserInfo(): UserInfoType {
 			avatar: decoded.avatar || "",
 			roles,
 		};
-	} catch (error) {
+	}
+	catch (error) {
 		console.error("Failed to decode token", error);
 		throw error;
 	}
 }
 
 export interface RefreshTokenResult {
-	access_token: string;
-	refresh_token: string;
-	token_type: string;
-	user_id: number;
+	access_token: string
+	refresh_token: string
+	token_type: string
+	user_id: number
 }
 
 export function fetchRefreshToken(data: { readonly refresh_token: string }) {

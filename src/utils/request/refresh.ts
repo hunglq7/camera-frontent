@@ -1,5 +1,6 @@
+import type { RefreshTokenResult } from "#src/api/user";
 import type { KyResponse, Options } from "ky";
-import { fetchRefreshToken, type RefreshTokenResult } from "#src/api/user";
+import { fetchRefreshToken } from "#src/api/user";
 
 import { useAuthStore } from "#src/store/auth";
 import ky from "ky";
@@ -43,7 +44,8 @@ export async function refreshTokenAndRetry(
 			request.headers.set(AUTH_HEADER, `Bearer ${newToken}`);
 			// 使用新的 token 重新发起请求
 			return ky(request, options);
-		} catch (error) {
+		}
+		catch (error) {
 			// 调用 onRefreshFailed 函数，传入错误对象
 			// refreshToken 认证未通过，拒绝所有等待的请求
 			onRefreshFailed(error);
@@ -51,11 +53,13 @@ export async function refreshTokenAndRetry(
 			goLogin();
 			// 抛出错误
 			throw error;
-		} finally {
+		}
+		finally {
 			// 无论是否发生错误，都将 isRefreshing 设置为 false
 			isRefreshing = false;
 		}
-	} else {
+	}
+	else {
 		// 等待 token 刷新完成
 		return new Promise<KyResponse>((resolve, reject) => {
 			// 添加刷新订阅者
@@ -75,8 +79,8 @@ export async function refreshTokenAndRetry(
 // 定义一个数组，用于存储所有等待 token 刷新的订阅者
 // 每个订阅者对象包含 resolve 和 reject 方法，分别用于在 token 刷新成功或失败时调用
 let refreshSubscribers: Array<{
-	resolve: (token: string) => void; // 当 token 刷新成功时调用的函数，传入新的 token
-	reject: (error: any) => void; // 当 token 刷新失败时调用的函数，传入错误信息
+	resolve: (token: string) => void // 当 token 刷新成功时调用的函数，传入新的 token
+	reject: (error: any) => void // 当 token 刷新失败时调用的函数，传入错误信息
 }> = [];
 
 /**
@@ -87,7 +91,7 @@ let refreshSubscribers: Array<{
  * @param token 刷新后的令牌字符串
  */
 function onRefreshed(token: string) {
-	refreshSubscribers.forEach((subscriber) => subscriber.resolve(token));
+	refreshSubscribers.forEach(subscriber => subscriber.resolve(token));
 	refreshSubscribers = []; // 清空订阅者列表
 }
 
@@ -99,13 +103,13 @@ function onRefreshed(token: string) {
  * @param error 刷新失败时产生的错误信息
  */
 function onRefreshFailed(error: any) {
-	refreshSubscribers.forEach((subscriber) => subscriber.reject(error));
+	refreshSubscribers.forEach(subscriber => subscriber.reject(error));
 	refreshSubscribers = []; // 清空订阅者列表
 }
 
 interface RefreshSubscriber {
-	resolve: (token: string) => void;
-	reject: (error: any) => void;
+	resolve: (token: string) => void
+	reject: (error: any) => void
 }
 
 /**

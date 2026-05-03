@@ -1,7 +1,7 @@
 import type { LoginInfo } from "#src/api/user";
 
 import { BasicButton } from "#src/components/basic-button";
-import { PASSWORD_RULES, USERNAME_RULES } from "#src/constants/rules";
+import { PASSWORD_RULES } from "#src/constants/rules";
 import { useAuthStore } from "#src/store/auth";
 
 import {
@@ -36,7 +36,8 @@ export function PasswordLogin() {
 		setLoading(true);
 		messageLoadingApi?.loading(t("authority.loginInProgress"), 0);
 
-		login(values).then(() => {
+		try {
+			await login(values);
 			messageLoadingApi?.destroy();
 			window.$message?.success(t("authority.loginSuccess"));
 			const redirect = searchParams.get("redirect");
@@ -44,21 +45,22 @@ export function PasswordLogin() {
 			if (redirect) {
 				navigate(`/${redirect.slice(1)}`);
 			}
-			// else {
-			// 	navigate(import.meta.env.VITE_BASE_HOME_PATH);
-			// }
-		}).catch((error) => {
+			else {
+				navigate(import.meta.env.VITE_BASE_HOME_PATH);
+			}
+		}
+		catch (error) {
 			messageLoadingApi?.destroy();
 			console.error("Login failed:", error);
 			window.$message?.error(t("authority.loginFailed"));
-		}).finally(() => {
+		}
+		finally {
 			messageLoadingApi?.destroy();
-			// Prevent multiple requests from being made by clicking the login button
 			setTimeout(() => {
 				window.$message?.destroy();
 				setLoading(false);
 			}, 1000);
-		});
+		}
 	};
 
 	return (

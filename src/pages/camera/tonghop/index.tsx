@@ -1,9 +1,9 @@
-import { TonghopCameraItemType } from "#src/api/camera/tonghop/types";
+import type { TonghopCameraItemType } from "#src/api/camera/tonghop/types";
 import type { ActionType, ProColumns, ProCoreActionType } from "@ant-design/pro-components";
 import {
-	fetchTonghopCamerasList,
-	fetchDeleteTonghopCameraItem,
 	fetchAddTonghopCameraItem,
+	fetchDeleteTonghopCameraItem,
+	fetchTonghopCamerasList,
 	fetchUpdateTonghopCameraItem,
 } from "#src/api/camera/tonghop/index";
 import { BasicButton } from "#src/components/basic-button";
@@ -13,7 +13,6 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import { Button, Popconfirm } from "antd";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAccess } from "#src/hooks/use-access";
 import * as XLSX from "xlsx";
 import { Detail } from "./component/detail";
 import { getConstantColumns } from "./constants";
@@ -37,10 +36,10 @@ export default function TonghopCamera() {
 		try {
 			const data = await fetchTonghopCamerasList();
 			const exportData = data.map((item, index) => ({
-				STT: index + 1,
+				"STT": index + 1,
 				"Camera ID": item.camera_id,
 				"Total Scans": item.total_scans,
-				Summary: item.summary,
+				"Summary": item.summary,
 				"Last Updated": item.last_updated,
 			}));
 			const worksheet = XLSX.utils.json_to_sheet(exportData, {
@@ -51,7 +50,8 @@ export default function TonghopCamera() {
 			XLSX.utils.book_append_sheet(workbook, worksheet, "TonghopCamera");
 			XLSX.writeFile(workbook, "tonghop_camera.xlsx");
 			window.$message?.success(t("common.exportSuccess"));
-		} catch (error) {
+		}
+		catch (error) {
 			console.error("Export failed", error);
 			window.$message?.error(t("common.exportFailed"));
 		}

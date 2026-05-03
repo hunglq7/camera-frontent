@@ -17,7 +17,8 @@
 	"menu": {
 		"camera": "Camera",
 		"danhmuc": "Danh sách camera",
+		"danhmucCamera": "Danh mục camera",
 		"tonghop": "Cập nhật camera"
 	}
-	
+
 }

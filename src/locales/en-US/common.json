@@ -27,7 +27,7 @@
 		"system": "System Management",
 		"bienap": "Biến áp",
 		"role": "Rơ le",
-		"danhmuc": "Danh mục thiết bị",
+		"danhmuc": "Danh mục ",
 		"maycao": "Máy cao",
 		"mayxuc": "Máy xúc",
 		"menu": "Menu Management",
@@ -106,5 +106,5 @@
 	"items": "items",
 	"exportExcel": "Export Excel",
 	"tonghopcamera": "Update camera"
-	
+
 }

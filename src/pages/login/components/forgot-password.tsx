@@ -37,7 +37,7 @@ export function ForgotPassword() {
 
 	const handleFinish = async () => {
 		setLoading(true);
-		setTargetDate(new Date().getTime() + 1000 * 30);
+		setTargetDate(Date.now() + 1000 * 30);
 		setTimeout(() => {
 			setLoading(false);
 		}, 1000);

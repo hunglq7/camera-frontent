@@ -1,15 +1,15 @@
-import { request } from "#src/utils/request";
 import type { TonghopCameraItemType } from "./types";
+import { request } from "#src/utils/request";
 
 export * from "./types";
 
-export const fetchTonghopCamerasList = () => {
+export function fetchTonghopCamerasList() {
 	return request
 		.get<TonghopCameraItemType[]>("/tong-hop-camera", {
 			ignoreLoading: true,
 		})
 		.json();
-};
+}
 
 export function fetchAddTonghopCameraItem(
 	data: Omit<TonghopCameraItemType, "id" | "last_updated">,

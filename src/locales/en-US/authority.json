@@ -1,8 +1,8 @@
 {
 	"welcomeBack": "Welcome Back",
 	"loginDescription": "Login to your account",
-	"pageTitle": "Out-of-the-box Admin System",
-	"pageDescription": "A simple, lightweight, and easy-to-use",
+	"pageTitle": "Phần mềm quản lý thiết bị",
+	"pageDescription": "Quản lý camera, hệ thống thông tin liên lạc",
 	"layout": {
 		"alignLeft": "Align Left",
 		"alignCenter": "Align Center",

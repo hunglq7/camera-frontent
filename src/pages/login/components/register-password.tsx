@@ -1,7 +1,6 @@
 import { BasicButton } from "#src/components/basic-button";
 import { PASSWORD_RULES, USERNAME_RULES } from "#src/constants/rules";
 import { useAuthStore } from "#src/store/auth";
-import type { UserRegisterPayload } from "#src/api/user/types";
 
 import {
 	Button,
@@ -13,9 +12,8 @@ import {
 } from "antd";
 import { use, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
-import { Link } from "react-router";
 import { FormModeContext } from "../form-mode-context";
 
 const { Title } = Typography;
@@ -43,14 +41,15 @@ export function RegisterPassword() {
 				username: values.username,
 				email: values.email,
 				password: values.password,
-				roles: ["user"],
 			});
 			window.$message?.success(t("authority.registerSuccess") || "Đăng ký thành công");
 			navigate(import.meta.env.VITE_BASE_HOME_PATH);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error("Register failed:", error);
 			window.$message?.error(t("authority.registerFailed") || "Đăng ký thất bại");
-		} finally {
+		}
+		finally {
 			setLoading(false);
 		}
 	};
@@ -82,16 +81,16 @@ export function RegisterPassword() {
 				</Form.Item>
 
 				<Form.Item
-label={t("authority.email")}
-name="email"
-rules={[
-{ required: true, type: "email", message: t("form.email.invalid") },
-]}
->
-<Input placeholder={t("form.email.required")} />
-</Form.Item>
+					label={t("authority.email")}
+					name="email"
+					rules={[
+						{ required: true, type: "email", message: t("form.email.invalid") },
+					]}
+				>
+					<Input placeholder={t("form.email.required")} />
+				</Form.Item>
 
-<Form.Item
+				<Form.Item
 					label={t("authority.password")}
 					name="password"
 					rules={PASSWORD_RULES(t)}

@@ -17,13 +17,13 @@ import {
 const HTTP_URL_REGEX = /https?:/;
 
 export function useMenu() {
-	const wholeMenus = useAccessStore((state) => state.wholeMenus);
+	const wholeMenus = useAccessStore(state => state.wholeMenus);
 	const { isMixedNav, isTwoColumnNav } = useLayout();
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const translatedMenus = translateMenus(wholeMenus, t);
 
-	const { pathname } = useCurrentRoute();
+	const { pathname } = useCurrentRoute() || {};
 	const matches = useMatches();
 	/**
 	 * 混合菜单模式下需要拆分 menu 的 items
@@ -37,17 +37,18 @@ export function useMenu() {
 	 * 混合导航模式下，侧边导航的顶级菜单 key
 	 */
 	const sideNavMenuKeyInSplitMode = useMemo(() => {
-		if (!shouldSplitMenuItems) return "";
+		if (!shouldSplitMenuItems)
+			return "";
 
 		// Try to find active menu from currentActiveMenu first
 		const activeMenuPath = matches.findLast(
-			(routeItem) => routeItem.handle?.currentActiveMenu,
+			routeItem => routeItem.handle?.currentActiveMenu,
 		)?.handle?.currentActiveMenu;
 
 		// Fallback to current pathname if no currentActiveMenu found
 		const targetPath = activeMenuPath
 			? removeTrailingSlash(activeMenuPath)
-			: removeTrailingSlash(pathname);
+			: removeTrailingSlash(pathname || "");
 
 		const { rootMenuPath } = findRootMenuByPath(translatedMenus, targetPath);
 		return rootMenuPath ?? "";
@@ -56,7 +57,7 @@ export function useMenu() {
 	/* 混合菜单模式下需要拆分 menu 的 items */
 	const splitSideNavItems = useMemo(() => {
 		const foundMenu = translatedMenus.find(
-			(item) => item?.key === sideNavMenuKeyInSplitMode,
+			item => item?.key === sideNavMenuKeyInSplitMode,
 		);
 		if (!foundMenu) {
 			return [];
@@ -91,24 +92,27 @@ export function useMenu() {
 	 * 菜单点击事件处理
 	 */
 	const handleMenuSelect = (key: string, mode: MenuProps["mode"]) => {
-		if (key === removeTrailingSlash(pathname)) {
+		if (key === removeTrailingSlash(pathname || "")) {
 			return;
 		}
 		/* 1. 非混合导航模式 2. 混合导航模式下的侧边导航 */
 		if (!shouldSplitMenuItems || mode !== "horizontal") {
 			if (HTTP_URL_REGEX.test(key)) {
 				window.open(key);
-			} else {
+			}
+			else {
 				navigate(key);
 			}
-		} else {
+		}
+		else {
 			/* 混合导航模式下的顶部导航 */
-			const rootMenu = translatedMenus.find((item) => item?.key === key);
+			const rootMenu = translatedMenus.find(item => item?.key === key);
 			const targetMenu = findDeepestFirstItem(rootMenu?.children ?? []);
 			/* 点击顶部的导航默认跳转到菜单下的第一个子项 */
 			if (!targetMenu) {
 				navigate(key);
-			} else {
+			}
+			else {
 				navigate(targetMenu.key);
 			}
 		}

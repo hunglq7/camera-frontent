@@ -12,13 +12,13 @@ import { create } from "zustand";
 
 interface AccessState {
 	// 路由菜单
-	wholeMenus: MenuItemType[];
+	wholeMenus: MenuItemType[]
 	// 有权限的 React Router 路由
-	routeList: AppRouteRecordRaw[];
+	routeList: AppRouteRecordRaw[]
 	// 扁平化后的路由，路由 id 作为索引 key
-	flatRouteList: Record<string, AppRouteRecordRaw>;
+	flatRouteList: Record<string, AppRouteRecordRaw>
 	// 是否获取到权限
-	isAccessChecked: boolean;
+	isAccessChecked: boolean
 }
 
 const initialState: AccessState = {
@@ -29,11 +29,11 @@ const initialState: AccessState = {
 };
 
 interface AccessAction {
-	setAccessStore: (routes: AppRouteRecordRaw[]) => AccessState;
-	reset: () => void;
+	setAccessStore: (routes: AppRouteRecordRaw[]) => AccessState
+	reset: () => void
 }
 
-export const useAccessStore = create<AccessState & AccessAction>((set) => ({
+export const useAccessStore = create<AccessState & AccessAction>(set => ({
 	...initialState,
 
 	setAccessStore: (routes) => {

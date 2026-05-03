@@ -1,4 +1,4 @@
-import { fetchAsyncRoutes, type UserInfoType } from "#src/api/user";
+import type { UserInfoType } from "#src/api/user";
 import { useCurrentRoute } from "#src/hooks/use-current-route";
 import { hideLoading } from "#src/plugins/hide-loading";
 import { setupLoading } from "#src/plugins/loading";
@@ -11,6 +11,7 @@ import { useAccessStore } from "#src/store/access";
 import { useAuthStore } from "#src/store/auth";
 import { usePreferencesStore } from "#src/store/preferences";
 import { useUserStore } from "#src/store/user";
+import { goLogin } from "#src/utils/request/go-login";
 
 import { useEffect } from "react";
 import { matchRoutes, Navigate, useLocation, useNavigate, useSearchParams } from "react-router";
@@ -58,98 +59,92 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			 */
 			setupLoading();
 
-			/**
-			 * @zh 初始化一个空数组来存放 Promise 对象
-			 * @en Initialize an empty array to hold Promise objects
-			 */
-			const promises = [];
+			let hasError = false;
 
-			/**
-			 * @zh 获取用户信息
-			 * @en Fetch user information
-			 */
-			promises.push(getUserInfo());
-
-			/**
-			 * @zh 启用了后端路由，且路由从单独接口中获取，则发起请求
-			 * @en If backend routing is enabled and the route is obtained from a separate interface, then initiate a request
-			 */
-			// Always use frontend routes, no backend fetch
-			// if (!enableFrontendAceess && enableBackendAccess && isSendRoutingRequest) {
-			// 	promises.push(fetchAsyncRoutes());
-			// }
-
-			const results = await Promise.allSettled(promises);
-			const userInfoResult = results[0];
-			const routeResult = results[1];
-			const routes = [];
-			const latestRoles = [];
-			/**
-			 * @zh 从用户接口中获取角色信息
-			 * @en Fetch role information from the user interface
-			 */
-			if (userInfoResult.status === "fulfilled" && "roles" in (userInfoResult.value as UserInfoType)) {
-				latestRoles.push(...(userInfoResult.value as UserInfoType)?.roles ?? []);
-			}
-			/**
-			 * @zh 启用了后端路由且路由从用户接口中获取
-			 * @en If backend routing is enabled and the route is obtained from the user interface
-			 */
-			if (!enableFrontendAceess && enableBackendAccess && !isSendRoutingRequest && userInfoResult.status === "fulfilled" && "menus" in (userInfoResult.value as UserInfoType)) {
-				routes.push(...await generateRoutesFromBackend((userInfoResult.value as UserInfoType)?.menus ?? []));
-			}
-			/**
-			 * @zh 启用了后端路由且路由从单独接口中获取
-			 * @en If backend routing is enabled and the route is obtained from a separate interface
-			 */
-			if (!enableFrontendAceess && enableBackendAccess && isSendRoutingRequest && routeResult && routeResult.status === "fulfilled" && "result" in (routeResult.value as any)) {
-				routes.push(...await generateRoutesFromBackend((routeResult.value as any)?.result ?? []));
-			}
-
-			/**
-			 * @zh 启用了前端路由
-			 * @en If frontend routing is enabled
-			 */
-			// Always use frontend routes
-			routes.push(...generateRoutesByFrontend(accessRoutes, latestRoles));
-
-			const uniqueRoutes = removeDuplicateRoutes(routes);
-			setAccessStore(uniqueRoutes);
-
-			const hasError = results.some(result => result.status === "rejected");
-			/**
-			 * @zh 网络请求失败，跳转到 500 页面
-			 * @en Network request failed, redirect to 500 page
-			 */
-			if (hasError) {
-				const unAuthorized = results.some((result: any) => result.reason?.response?.status === 401);
-				if (!unAuthorized) {
-					return navigate(exception500Path);
-				}
-			}
-
-			/**
-			 *
-			 * @zh 开启动态路由条件下需要替换当前路由？
-			 * 1. 浏览器导航进入动态路由地址，例如 /system/user
-			 * 2. 动态路由未添加到路由，所以地址栏中依然是 /system/user 但匹配到的路由是 fallback (path = "*") 路由
-			 * 3. 添加完动态路由后，使用 replace 替换当前路由，触发程序重新匹配到 /system/user 路由
-			 *
-			 * Refer：https://router.vuejs.org/guide/advanced/dynamic-routing#Adding-routes
-			 *
-			 * @en Under the condition of dynamic routing, do you need to replace the current route?
-			 * 1. Browser navigation into a dynamic routing address, such as /system/user
-			 * 2. The dynamic route is not added to the route, so the address bar is still /system/user but the matched route is the fallback (path = "*") route
-			 * 3. After adding the dynamic route, use replace to replace the current route and trigger the program to match /system/user again
-			 */
-			navigate(`${pathname}${search}`, {
-				replace: true,
+			try {
 				/**
-				 * @zh 保证替换路由前不会显示 404 页面（登录页面，网速切换为 3G 会闪烁显示 404 页面）
-				 * @en Ensure that the 404 page will not be displayed before replacing the route
+				 * @zh 初始化一个空数组来存放 Promise 对象
+				 * @en Initialize an empty array to hold Promise objects
 				 */
-				flushSync: true,
-			});
+				const promises = [];
+
+				/**
+				 * @zh 获取用户信息
+				 * @en Fetch user information
+				 */
+				promises.push(getUserInfo());
+
+				/**
+				 * @zh 启用了后端路由，且路由从单独接口中获取，则发起请求
+				 * @en If backend routing is enabled and the route is obtained from a separate interface, then initiate a request
+				 */
+				// Always use frontend routes, no backend fetch
+				// if (!enableFrontendAceess && enableBackendAccess && isSendRoutingRequest) {
+				// 	promises.push(fetchAsyncRoutes());
+				// }
+
+				const results = await Promise.allSettled(promises);
+				hasError = results.some(result => result.status === "rejected");
+				const userInfoResult = results[0];
+				const routeResult = results[1];
+				const routes = [];
+				const latestRoles = [];
+				/**
+				 * @zh 从用户接口中获取角色信息
+				 * @en Fetch role information from the user interface
+				 */
+				if (userInfoResult.status === "fulfilled" && "roles" in (userInfoResult.value as UserInfoType)) {
+					latestRoles.push(...(userInfoResult.value as UserInfoType)?.roles ?? []);
+				}
+				/**
+				 * @zh 启用了后端路由且路由从用户接口中获取
+				 * @en If backend routing is enabled and the route is obtained from the user interface
+				 */
+				if (!enableFrontendAceess && enableBackendAccess && !isSendRoutingRequest && userInfoResult.status === "fulfilled" && "menus" in (userInfoResult.value as UserInfoType)) {
+					routes.push(...await generateRoutesFromBackend((userInfoResult.value as UserInfoType)?.menus ?? []));
+				}
+				/**
+				 * @zh 启用了后端路由且路由从单独接口中获取
+				 * @en If backend routing is enabled and the route is obtained from a separate interface
+				 */
+				if (!enableFrontendAceess && enableBackendAccess && isSendRoutingRequest && routeResult && routeResult.status === "fulfilled" && "result" in (routeResult.value as any)) {
+					routes.push(...await generateRoutesFromBackend((routeResult.value as any)?.result ?? []));
+				}
+
+				/**
+				 * @zh 启用了前端路由
+				 * @en If frontend routing is enabled
+				 */
+				// Always use frontend routes
+				routes.push(...generateRoutesByFrontend(accessRoutes, latestRoles));
+
+				const uniqueRoutes = removeDuplicateRoutes(routes);
+				setAccessStore(uniqueRoutes);
+
+				if (hasError) {
+					const unAuthorized = results.some((result: any) => result.reason?.response?.status === 401);
+					if (unAuthorized) {
+						// Token invalid, logout
+						useAuthStore.getState().reset();
+						useUserStore.getState().reset();
+						goLogin();
+						return;
+					}
+					else {
+						return navigate(exception500Path);
+					}
+				}
+				/**
+				 * @zh 无论成功还是失败，都隐藏加载动画
+				 * @en Hide loading animation regardless of success or failure
+				 */
+				hideLoading();
+			}
+			catch (error) {
+				console.error("Error fetching user info and routes:", error);
+				hasError = true;
+				hideLoading();
+			}
 		}
 		/**
 		 * @zh 只有在以下条件下才执行获取用户信息和路由的逻辑
@@ -299,7 +294,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 		 */
 	) ?? [];
 
-	const hasChildren = matches[matches.length - 1]?.route?.children?.filter(item => !item.index)?.length;
+	const hasChildren = matches.at(-1)?.route?.children?.filter(item => !item.index)?.length;
 	/**
 	 * @zh 如果当前路由有子路由，则跳转到 404 页面
 	 * @en If the current route has sub-routes, jump to the 404 page

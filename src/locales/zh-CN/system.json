@@ -51,12 +51,12 @@
 		"addTonghopbienap": "Thêm tổng hợp biến áp",
 		"editTonghopbienap": "Sửa tổng hợp biến áp"
 	},
-		"role":{
+	"role": {
 		"roleDanhmuc": "Danh mục Rơ le",
 		"addRole": "Thêm rơ le",
 		"editRole": "Sửa rơ le"
 	},
-		"tonghoprole": {
+	"tonghoprole": {
 		"tonghoprole": "Tổng hợp rơ le",
 		"addTonghoprole": "Thêm  rơ le",
 		"editTonghoprole": "Sửa  rơ le"

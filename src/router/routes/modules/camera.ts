@@ -1,7 +1,11 @@
 import type { AppRouteRecordRaw } from "#src/router/types";
 import ContainerLayout from "#src/layout/container-layout";
 import { lazy } from "react";
+
 const DanhMucCamera = lazy(() => import("#src/pages/camera/danhmuc"));
+const DanhMucCameraCatalog = lazy(
+	() => import("#src/pages/camera/danhmuc_camera"),
+);
 const TongHopCamera = lazy(() => import("#src/pages/camera/tonghop"));
 
 const routes: AppRouteRecordRaw[] = [
@@ -21,6 +25,20 @@ const routes: AppRouteRecordRaw[] = [
 				handle: {
 					icon: "TableOutlined",
 					title: "camera.menu.danhmuc",
+					roles: ["user", "admin"],
+					permissions: [
+						"permission:button:add",
+						"permission:button:update",
+						"permission:button:delete",
+					],
+				},
+			},
+			{
+				path: "/camera/danhmuc-camera",
+				Component: DanhMucCameraCatalog,
+				handle: {
+					icon: "TableOutlined",
+					title: "camera.menu.danhmucCamera",
 					roles: ["user", "admin"],
 					permissions: [
 						"permission:button:add",

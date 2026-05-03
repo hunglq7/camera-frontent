@@ -34,13 +34,13 @@ function normalizePagePath(path: string) {
 }
 
 function findPageModulePath(candidate: string, pageModulePaths: string[]) {
-	const exactMatch = pageModulePaths.find((path) => path === candidate);
+	const exactMatch = pageModulePaths.find(path => path === candidate);
 	if (exactMatch) {
 		return exactMatch;
 	}
 
 	const lowerMatch = pageModulePaths.find(
-		(path) => path.toLowerCase() === candidate.toLowerCase(),
+		path => path.toLowerCase() === candidate.toLowerCase(),
 	);
 	if (lowerMatch) {
 		return lowerMatch;
@@ -61,7 +61,8 @@ function getNormalizedComponentPath(
 	const candidates = [];
 	if (TSX_JSX_EXTENSION_REGEX.test(basePath)) {
 		candidates.push(basePath);
-	} else {
+	}
+	else {
 		candidates.push(`${basePath}.tsx`);
 		candidates.push(`${basePath}.jsx`);
 		candidates.push(`${basePath}/index.tsx`);
@@ -84,7 +85,8 @@ export function getComponentPathByRoute(
 ) {
 	if (route.component) {
 		return getNormalizedComponentPath(route.component, pageModulePaths);
-	} else {
+	}
+	else {
 		return getNormalizedComponentPath(route.path || "", pageModulePaths);
 	}
 }
@@ -97,7 +99,8 @@ export async function generateRoutesFromBackend(
 	backendRoutes: Array<AppRouteRecordRaw>,
 ) {
 	const pageModulePaths = Object.keys(pageModules);
-	if (!backendRoutes?.length) return [];
+	if (!backendRoutes?.length)
+		return [];
 
 	/**
 	 * @zh 动态加载并设置路由组件
@@ -111,13 +114,14 @@ export async function generateRoutesFromBackend(
 	) => {
 		const modulePath = componentPath;
 		const moduleIndex = pageModulePaths.findIndex(
-			(path) => path === modulePath,
+			path => path === modulePath,
 		);
 
 		if (moduleIndex !== -1) {
 			const lazyComponent = pageModules[pageModulePaths[moduleIndex]];
 			route.Component = lazy(lazyComponent as any);
-		} else {
+		}
+		else {
 			console.warn(`[Frontend component not found]: ${componentPath}`);
 			route.Component = ExceptionUnknownComponent;
 		}
@@ -170,7 +174,7 @@ export async function generateRoutesFromBackend(
 		// 递归处理子路由
 		if (transformedRoute.children?.length) {
 			transformedRoute.children = await Promise.all(
-				transformedRoute.children.map((child) =>
+				transformedRoute.children.map(child =>
 					transformRoute(
 						child,
 						getComponentPathByRoute(transformedRoute, pageModulePaths),
@@ -205,7 +209,7 @@ export async function generateRoutesFromBackend(
 	// 处理路由配置
 	const normalizedRoutes = backendRoutes.map(normalizeRouteStructure);
 	const transformedRoutes = await Promise.all(
-		normalizedRoutes.map((route) => transformRoute(route)),
+		normalizedRoutes.map(route => transformRoute(route)),
 	);
 
 	return addRouteIdByPath(transformedRoutes);

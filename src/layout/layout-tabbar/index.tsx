@@ -20,7 +20,8 @@ import { tabbarHeight } from "../constants";
 import { DraggableTabBar } from "./components/draggable-tab-bar";
 import { TabMaximize } from "./components/tab-maximize";
 import { TabOptions } from "./components/tab-options";
-import { TabActionKeys, useDropdownMenu } from "./hooks/use-dropdown-menu";
+import { TabActionKeys } from "./hooks/constants";
+import { useDropdownMenu } from "./hooks/use-dropdown-menu";
 import { useStyles } from "./style";
 
 /**
@@ -182,7 +183,7 @@ export default function LayoutTabbar() {
 		if (normalizedPath !== activeKey) {
 			setActiveKey(normalizedPath);
 
-			const routeTitle = currentRoute.handle?.title as string;
+			const routeTitle = currentRoute?.handle?.title as string;
 
 			addTab(normalizedPath, {
 				key: normalizedPath,

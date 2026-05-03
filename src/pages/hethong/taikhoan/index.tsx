@@ -1,9 +1,9 @@
-import { BasicContent } from "#src/components/basic-content";
 import type { UserItemType, UserListResponse, UserSavePayload, UserUpdatePayload } from "#src/api/user/types";
-import { fetchCreateUser, fetchDeleteUser, fetchDeleteUsers, fetchUpdateUser, fetchUserList, fetchUploadAvatar } from "#src/api/user";
+import { fetchCreateUser, fetchDeleteUser, fetchDeleteUsers, fetchUpdateUser, fetchUploadAvatar, fetchUserList } from "#src/api/user";
+import { BasicContent } from "#src/components/basic-content";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Form, Input, message, Modal, Popconfirm, Select, Space, Table, Tag, Typography, Upload } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMemo, useState } from "react";
 
 const roleOptions = [
@@ -39,7 +39,7 @@ export default function TaiKhoan() {
 	});
 
 	const updateMutation = useMutation({
-		mutationFn: ({ id, payload }: { id: number; payload: UserUpdatePayload }) => fetchUpdateUser(id, payload),
+		mutationFn: ({ id, payload }: { id: number, payload: UserUpdatePayload }) => fetchUpdateUser(id, payload),
 		onSuccess: async () => {
 			message.success("Cập nhật tài khoản thành công");
 			setVisible(false);
@@ -86,9 +86,10 @@ export default function TaiKhoan() {
 							avatar: data.filename,
 							password: "",
 							roles: currentValues.roles || [],
-						}
+						},
 					});
-				} catch (error) {
+				}
+				catch (error) {
 					console.error(error);
 					message.error("Cập nhật avatar thất bại");
 				}
@@ -136,7 +137,7 @@ export default function TaiKhoan() {
 				dataIndex: "roles",
 				render: (roles: string[]) => (
 					<Space size={8} wrap>
-						{roles.map((role) => (
+						{roles.map(role => (
 							<Tag key={role} color={role === "admin" ? "volcano" : "blue"}>
 								{role}
 							</Tag>
@@ -147,9 +148,9 @@ export default function TaiKhoan() {
 			{
 				title: "Ngày tạo",
 				dataIndex: "created_at",
-				render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
+				render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
 			},
-			
+
 			{
 				title: "Hành động",
 				key: "actions",
@@ -217,7 +218,8 @@ export default function TaiKhoan() {
 				roles: values.roles || [],
 			};
 			await updateMutation.mutateAsync({ id: editingUser.id, payload });
-		} else {
+		}
+		else {
 			await createMutation.mutateAsync({
 				username: values.username,
 				email: values.email,
@@ -259,17 +261,17 @@ export default function TaiKhoan() {
 			<Table<UserItemType>
 				rowKey="id"
 				loading={
-				isLoading ||
-				createMutation.isPending ||
-				updateMutation.isPending ||
-				deleteMutation.isPending ||
-				batchDeleteMutation.isPending
-			}
+					isLoading
+					|| createMutation.isPending
+					|| updateMutation.isPending
+					|| deleteMutation.isPending
+					|| batchDeleteMutation.isPending
+				}
 				columns={columns}
 				dataSource={users}
 				rowSelection={{
 					selectedRowKeys,
-					onChange: (keys) => setSelectedRowKeys(keys),
+					onChange: keys => setSelectedRowKeys(keys),
 				}}
 				pagination={false}
 				scroll={{ x: 800 }}
@@ -311,7 +313,7 @@ export default function TaiKhoan() {
 						<div className="flex flex-col gap-3">
 							{avatarUrl && (
 								<Avatar
-									src={avatarUrl.startsWith('http') ? avatarUrl : `${import.meta.env.VITE_API_BASE_URL}${avatarUrl}`}
+									src={avatarUrl.startsWith("http") ? avatarUrl : `${import.meta.env.VITE_API_BASE_URL}${avatarUrl}`}
 									size={80}
 								/>
 							)}

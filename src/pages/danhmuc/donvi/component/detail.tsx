@@ -1,17 +1,17 @@
-import { DanhMucMayCaoItemType } from "#src/api/danhmuc/maycao/types";
+import type { DanhMucDonViItemType } from "#src/api/danhmuc/donvi/types";
 import { BasicButton } from "#src/components/basic-button";
-import { TEN_THIET_BI_RULES, LOAI_THIET_BI_RULES } from "#src/constants/rules";
+import { TEN_DON_VI_RULES } from "#src/constants/rules";
 
 import { Form, Input, Modal } from "antd";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DetailProps {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	title: string;
-	detailData: Partial<DanhMucMayCaoItemType>;
-	onFinish: (values: DanhMucMayCaoItemType) => Promise<void>;
+	open: boolean
+	setOpen: (open: boolean) => void
+	title: string
+	detailData: Partial<DanhMucDonViItemType>
+	onFinish: (values: DanhMucDonViItemType) => Promise<void>
 }
 
 export function Detail({ open, setOpen, title, detailData, onFinish }: DetailProps) {
@@ -24,7 +24,7 @@ export function Detail({ open, setOpen, title, detailData, onFinish }: DetailPro
 		}
 	}, [open, detailData, form]);
 
-	const handleFinish = async (values: DanhMucMayCaoItemType) => {
+	const handleFinish = async (values: DanhMucDonViItemType) => {
 		await onFinish(values);
 		form.resetFields();
 		setOpen(false);
@@ -50,19 +50,11 @@ export function Detail({ open, setOpen, title, detailData, onFinish }: DetailPro
 				initialValues={detailData}
 			>
 				<Form.Item
-					label={t("danhmuc.tenThietBi")}
-					name="ten_thiet_bi"
-					rules={TEN_THIET_BI_RULES(t)}
+					label={t("danhmuc.tenDonVi")}
+					name="ten_don_vi"
+					rules={TEN_DON_VI_RULES(t)}
 				>
-					<Input placeholder={t("danhmuc.tenThietBiPlaceholder")} />
-				</Form.Item>
-
-				<Form.Item
-					label={t("danhmuc.loaiThietBi")}
-					name="loai_thiet_bi"
-					rules={LOAI_THIET_BI_RULES(t)}
-				>
-					<Input placeholder={t("danhmuc.loaiThietBiPlaceholder")} />
+					<Input placeholder={t("danhmuc.tenDonViPlaceholder")} />
 				</Form.Item>
 
 				<div className="flex justify-end gap-2">

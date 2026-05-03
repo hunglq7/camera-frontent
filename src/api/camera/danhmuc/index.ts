@@ -1,11 +1,11 @@
-import { request } from "#src/utils/request";
-import { useAuthStore } from "#src/store/auth";
 import type { DanhmucCameraItemType } from "./types";
+import { useAuthStore } from "#src/store/auth";
+import { request } from "#src/utils/request";
 
 export * from "./types";
 
 /* Lấy danh sách danh mục camera */
-export const fetchDanhmucCamerasList = () => {
+export function fetchDanhmucCamerasList() {
 	return request
 		.get<DanhmucCameraItemType[]>("cameras", {
 			ignoreLoading: true,
@@ -18,7 +18,7 @@ export const fetchDanhmucCamerasList = () => {
 			console.error("fetchDanhmucCamerasList error:", error);
 			throw error;
 		});
-};
+}
 
 /* Thêm mới danh mục camera */
 export function fetchAddDanhMucCameraItem(

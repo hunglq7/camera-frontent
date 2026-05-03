@@ -1,17 +1,17 @@
-import { DanhMucMayXucItemType } from "#src/api/danhmuc/mayxuc/types";
+import type { ViTriLapDatItemType } from "#src/api/danhmuc/vitri/types";
 import { BasicButton } from "#src/components/basic-button";
-import { TEN_THIET_BI_RULES, LOAI_THIET_BI_RULES } from "#src/constants/rules";
+import { FORM_REQUIRED } from "#src/constants/rules";
 
 import { Form, Input, Modal } from "antd";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DetailProps {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	title: string;
-	detailData: Partial<DanhMucMayXucItemType>;
-	onFinish: (values: DanhMucMayXucItemType) => Promise<void>;
+	open: boolean
+	setOpen: (open: boolean) => void
+	title: string
+	detailData: Partial<ViTriLapDatItemType>
+	onFinish: (values: ViTriLapDatItemType) => Promise<void>
 }
 
 export function Detail({ open, setOpen, title, detailData, onFinish }: DetailProps) {
@@ -24,7 +24,7 @@ export function Detail({ open, setOpen, title, detailData, onFinish }: DetailPro
 		}
 	}, [open, detailData, form]);
 
-	const handleFinish = async (values: DanhMucMayXucItemType) => {
+	const handleFinish = async (values: ViTriLapDatItemType) => {
 		await onFinish(values);
 		form.resetFields();
 		setOpen(false);
@@ -50,19 +50,18 @@ export function Detail({ open, setOpen, title, detailData, onFinish }: DetailPro
 				initialValues={detailData}
 			>
 				<Form.Item
-					label={t("danhmuc.tenThietBi")}
-					name="ten_thiet_bi"
-					rules={TEN_THIET_BI_RULES(t)}
+					label={t("danhmuc.tenViTri")}
+					name="ten_vi_tri"
+					rules={FORM_REQUIRED}
 				>
-					<Input placeholder={t("danhmuc.tenThietBiPlaceholder")} />
+					<Input placeholder={t("danhmuc.tenViTriPlaceholder")} />
 				</Form.Item>
 
 				<Form.Item
-					label={t("danhmuc.loaiThietBi")}
-					name="loai_thiet_bi"
-					rules={LOAI_THIET_BI_RULES(t)}
+					label={t("danhmuc.moTa")}
+					name="mo_ta"
 				>
-					<Input placeholder={t("danhmuc.loaiThietBiPlaceholder")} />
+					<Input.TextArea placeholder={t("danhmuc.moTaPlaceholder")} rows={3} />
 				</Form.Item>
 
 				<div className="flex justify-end gap-2">

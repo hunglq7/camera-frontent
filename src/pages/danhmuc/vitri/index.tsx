@@ -1,36 +1,45 @@
-import { DanhMucMayXucItemType } from "#src/api/danhmuc/mayxuc/types";
+import type { ViTriLapDatItemType } from "#src/api/danhmuc/vitri/types";
 import type { ActionType, ProColumns, ProCoreActionType } from "@ant-design/pro-components";
 import {
-	fetchDanhMucMayXucList,
-	fetchDeleteDanhMucMayXucItem,
-	fetchDeleteMultipleDanhMucMayXucItems,
-	fetchAddDanhMucMayXucItem,
-	fetchUpdateDanhMucMayXucItem
-} from "#src/api/danhmuc/mayxuc/index";
+	fetchAddViTriLapDatItem,
+	fetchDeleteMultipleViTriLapDatItems,
+	fetchDeleteViTriLapDatItem,
+	fetchUpdateViTriLapDatItem,
+	fetchViTriLapDatList,
+} from "#src/api/danhmuc/vitri/index";
 import { BasicButton } from "#src/components/basic-button";
 import { BasicContent } from "#src/components/basic-content";
 import { BasicTable } from "#src/components/basic-table";
 import { accessControlCodes, useAccess } from "#src/hooks/use-access";
-import { PlusCircleOutlined, DownloadOutlined } from "@ant-design/icons";
-import { Button, Popconfirm } from "antd";
+import { ClearOutlined, DownloadOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Input, Popconfirm, Row } from "antd";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import * as XLSX from "xlsx";
+
 import { Detail } from "./component/detail";
 import { getConstantColumns } from "./constants";
 
-export default function DanhMucMayXuc() {
+export default function ViTriLapDat() {
 	const { t } = useTranslation();
 	const { hasAccessByCodes } = useAccess();
 	const [isOpen, setIsOpen] = useState(false);
 	const [title, setTitle] = useState("");
-	const [detailData, setDetailData] = useState<Partial<DanhMucMayXucItemType>>({});
+	const [detailData, setDetailData] = useState<Partial<ViTriLapDatItemType>>({});
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+	const [searchTenViTri, setSearchTenViTri] = useState("");
+	const [searchMoTa, setSearchMoTa] = useState("");
 	const actionRef = useRef<ActionType>(null);
+
+	const handleClearFilters = () => {
+		setSearchTenViTri("");
+		setSearchMoTa("");
+		actionRef.current?.reload?.();
+	};
 
 	// Xóa một bản ghi
 	const handleDeleteRow = async (id: number, action?: ProCoreActionType<object>) => {
-		await fetchDeleteDanhMucMayXucItem(id);
+		await fetchDeleteViTriLapDatItem(id);
 		setSelectedRowKeys([]);
 		await action?.reload?.();
 		window.$message?.success(t("common.deleteSuccess"));
@@ -41,59 +50,66 @@ export default function DanhMucMayXuc() {
 		if (selectedRowKeys.length === 0) {
 			return;
 		}
-		await fetchDeleteMultipleDanhMucMayXucItems(selectedRowKeys as number[]);
+		await fetchDeleteMultipleViTriLapDatItems(selectedRowKeys as number[]);
 		setSelectedRowKeys([]);
 		await actionRef.current?.reload();
 		window.$message?.success(t("common.deleteSuccess"));
 	};
 
-	// Xuất ra file Excel
-	const handleExportExcel = async () => {
+	const filterData = (data: ViTriLapDatItemType[]) => {
+		return data.filter((item) => {
+			const matchTenViTri = searchTenViTri === "" || (item.ten_vi_tri?.toLowerCase().includes(searchTenViTri.toLowerCase()) ?? false);
+			const matchMoTa = searchMoTa === "" || (item.mo_ta?.toLowerCase().includes(searchMoTa.toLowerCase()) ?? false);
+			return matchTenViTri && matchMoTa;
+		});
+	};
+
+	const exportExcel = async () => {
 		try {
-			const data = await fetchDanhMucMayXucList();
-			const exportData = data.map((item, index) => ({
-				STT: index + 1,
-				'Tên thiết bị': item.ten_thiet_bi,
-				'Loại thiết bị': item.loai_thiet_bi,
+			const data = await fetchViTriLapDatList();
+			const exportData = filterData(data).map((item, index) => ({
+				"STT": index + 1,
+				"Tên vị trí": item.ten_vi_tri,
+				"Mô tả": item.mo_ta || "",
 			}));
 			const worksheet = XLSX.utils.json_to_sheet(exportData, {
-				header: ['STT', 'Tên thiết bị', 'Loại thiết bị']
+				header: ["STT", "Tên vị trí", "Mô tả"],
 			});
-			// Set độ rộng cột
-			worksheet['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 35 }];
+			worksheet["!cols"] = [{ wch: 6 }, { wch: 30 }, { wch: 50 }];
 			const workbook = XLSX.utils.book_new();
-			XLSX.utils.book_append_sheet(workbook, worksheet, "DanhMucMayXuc");
-			XLSX.writeFile(workbook, "danh_muc_may_xuc.xlsx");
+			XLSX.utils.book_append_sheet(workbook, worksheet, "ViTriLapDat");
+			XLSX.writeFile(workbook, "vi_tri_lap_dat.xlsx");
 			window.$message?.success(t("common.exportSuccess"));
-		} catch (error) {
+		}
+		catch (error) {
 			console.error("Export failed", error);
 			window.$message?.error(t("common.exportFailed"));
 		}
 	};
 
 	// Xử lý thêm mới
-	const handleAdd = async (values: DanhMucMayXucItemType) => {
-		await fetchAddDanhMucMayXucItem({
-			ten_thiet_bi: values.ten_thiet_bi,
-			loai_thiet_bi: values.loai_thiet_bi,
+	const handleAdd = async (values: ViTriLapDatItemType) => {
+		await fetchAddViTriLapDatItem({
+			ten_vi_tri: values.ten_vi_tri,
+			mo_ta: values.mo_ta,
 		});
 		await actionRef.current?.reload();
 		window.$message?.success(t("common.addSuccess"));
 	};
 
 	// Xử lý cập nhật
-	const handleUpdate = async (values: DanhMucMayXucItemType) => {
+	const handleUpdate = async (values: ViTriLapDatItemType) => {
 		if (detailData.id) {
-			await fetchUpdateDanhMucMayXucItem(detailData.id, {
-				ten_thiet_bi: values.ten_thiet_bi,
-				loai_thiet_bi: values.loai_thiet_bi,
+			await fetchUpdateViTriLapDatItem(detailData.id, {
+				ten_vi_tri: values.ten_vi_tri,
+				mo_ta: values.mo_ta,
 			});
 			await actionRef.current?.reload();
 			window.$message?.success(t("common.updateSuccess"));
 		}
 	};
 
-	const columns: ProColumns<DanhMucMayXucItemType>[] = [
+	const columns: ProColumns<ViTriLapDatItemType>[] = [
 		...getConstantColumns(t),
 		{
 			title: t("common.action"),
@@ -109,7 +125,7 @@ export default function DanhMucMayXuc() {
 					disabled={false}
 					onClick={() => {
 						setIsOpen(true);
-						setTitle(t("danhmuc.editMayXuc"));
+						setTitle(t("danhmuc.editViTri"));
 						setDetailData(record);
 					}}
 				>
@@ -126,7 +142,7 @@ export default function DanhMucMayXuc() {
 						type="link"
 						size="small"
 						danger
-						disabled={!hasAccessByCodes(accessControlCodes.delete)}
+						disabled={false}
 					>
 						{t("common.delete")}
 					</BasicButton>
@@ -137,18 +153,51 @@ export default function DanhMucMayXuc() {
 
 	return (
 		<BasicContent>
-			<BasicTable<DanhMucMayXucItemType>
-				headerTitle={t("danhmuc.mayXucManagement")}
+			<Card style={{ marginBottom: 16 }}>
+				<Row gutter={[16, 16]}>
+					<Col xs={24} sm={12} md={8}>
+						<label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>
+							{t("danhmuc.tenViTri")}
+						</label>
+						<Input
+							placeholder={t("common.search")}
+							value={searchTenViTri}
+							onChange={e => setSearchTenViTri(e.target.value)}
+							allowClear
+						/>
+					</Col>
+					<Col xs={24} sm={12} md={8}>
+						<label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>
+							{t("danhmuc.moTa")}
+						</label>
+						<Input
+							placeholder={t("common.search")}
+							value={searchMoTa}
+							onChange={e => setSearchMoTa(e.target.value)}
+							allowClear
+						/>
+					</Col>
+				</Row>
+				<Row style={{ marginTop: 12, justifyContent: "flex-end" }}>
+					<Button icon={<ClearOutlined />} onClick={handleClearFilters}>
+						{t("common.clear")}
+					</Button>
+				</Row>
+			</Card>
+
+			<BasicTable<ViTriLapDatItemType>
+				headerTitle={t("danhmuc.viTriLapDatManagement")}
 				actionRef={actionRef}
 				rowKey="id"
 				search={false}
 				columns={columns}
-				request={async (_params, _sorter) => {
-					const data = await fetchDanhMucMayXucList();
+				request={async () => {
+					const data = await fetchViTriLapDatList();
+					const filtered = filterData(data);
 					return {
-						data,
+						data: filtered,
 						success: true,
-						total: data.length,
+						total: filtered.length,
 					};
 				}}
 				rowSelection={{
@@ -160,10 +209,10 @@ export default function DanhMucMayXuc() {
 						key="add"
 						type="primary"
 						icon={<PlusCircleOutlined />}
-						disabled={!hasAccessByCodes(accessControlCodes.add)}
+						disabled={false}
 						onClick={() => {
 							setIsOpen(true);
-							setTitle(t("danhmuc.addMayXuc"));
+							setTitle(t("danhmuc.addViTri"));
 							setDetailData({});
 						}}
 					>
@@ -180,7 +229,7 @@ export default function DanhMucMayXuc() {
 					<BasicButton
 						key="export"
 						icon={<DownloadOutlined />}
-						onClick={handleExportExcel}
+						onClick={exportExcel}
 					>
 						{t("common.export")}
 					</BasicButton>,

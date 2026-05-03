@@ -2,18 +2,18 @@ import type { DanhmucCameraItemType } from "#src/api/camera/danhmuc/types";
 import type { TreeDataNodeWithId } from "#src/components/basic-form";
 import { fetchAddDanhMucCameraItem, fetchDanhmucCamerasList, fetchUpdateDanhMucCameraItem } from "#src/api/camera/danhmuc/index";
 import { BasicButton } from "#src/components/basic-button";
-import { Drawer, Form, Input, Radio } from "antd";
 import { useMutation } from "@tanstack/react-query";
+import { Drawer, Form, Input, Radio } from "antd";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DetailProps {
-	treeData: TreeDataNodeWithId[];
-	title: React.ReactNode;
-	open: boolean;
-	detailData: Partial<DanhmucCameraItemType>;
-	onCloseChange: () => void;
-	refreshTable?: () => void;
+	treeData: TreeDataNodeWithId[]
+	title: React.ReactNode
+	open: boolean
+	detailData: Partial<DanhmucCameraItemType>
+	onCloseChange: () => void
+	refreshTable?: () => void
 }
 
 export function Detail({ title, open, onCloseChange, detailData, treeData: _treeData, refreshTable }: DetailProps) {
@@ -35,7 +35,7 @@ export function Detail({ title, open, onCloseChange, detailData, treeData: _tree
 		}
 
 		const cameras = await fetchDanhmucCamerasList();
-		const duplicate = cameras.some((camera) => camera.ip_address === ip && camera.id !== detailData.id);
+		const duplicate = cameras.some(camera => camera.ip_address === ip && camera.id !== detailData.id);
 		if (duplicate) {
 			return Promise.reject(new Error(t("camera.ipDuplicate") || "IP address already exists"));
 		}
@@ -48,7 +48,8 @@ export function Detail({ title, open, onCloseChange, detailData, treeData: _tree
 			const updateData = { ...values, id: detailData.id };
 			await updateDanhMucCameraItemMutation.mutateAsync(updateData);
 			window.$message?.success(t("common.updateSuccess"));
-		} else {
+		}
+		else {
 			await addCameraItemMutation.mutateAsync(values);
 			window.$message?.success(t("common.addSuccess"));
 		}
@@ -59,14 +60,15 @@ export function Detail({ title, open, onCloseChange, detailData, treeData: _tree
 
 	useEffect(() => {
 		if (open) {
-			console.warn('Form opened, detailData:', detailData);
+			console.warn("Form opened, detailData:", detailData);
 			form.resetFields();
 			if (detailData.id) {
-				console.warn('Setting form values for edit:', detailData);
+				console.warn("Setting form values for edit:", detailData);
 				form.setFieldsValue(detailData as DanhmucCameraItemType);
-				console.warn('Form values after setFieldsValue:', form.getFieldsValue());
-			} else {
-				console.warn('Setting form values for add');
+				console.warn("Form values after setFieldsValue:", form.getFieldsValue());
+			}
+			else {
+				console.warn("Setting form values for add");
 				form.setFieldsValue({ is_online: true } as Partial<DanhmucCameraItemType>);
 			}
 		}
@@ -74,7 +76,7 @@ export function Detail({ title, open, onCloseChange, detailData, treeData: _tree
 
 	return (
 		<Drawer
-			key={`drawer-${detailData.id || 'new'}`}
+			key={`drawer-${detailData.id || "new"}`}
 			title={title}
 			open={open}
 			onClose={() => {
@@ -131,11 +133,12 @@ export function Detail({ title, open, onCloseChange, detailData, treeData: _tree
 					<Input />
 				</Form.Item>
 
-				<div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+				<div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
 					<BasicButton onClick={() => {
 						form.resetFields();
 						onCloseChange();
-					}}>
+					}}
+					>
 						{t("common.cancel")}
 					</BasicButton>
 					<BasicButton type="primary" htmlType="submit">
@@ -146,5 +149,3 @@ export function Detail({ title, open, onCloseChange, detailData, treeData: _tree
 		</Drawer>
 	);
 }
-
-   

@@ -1,14 +1,13 @@
-import { fetchUploadAvatar, fetchUpdateUser } from "#src/api/user";
-import { useAuthStore } from "#src/store/auth";
+import { fetchUpdateUser, fetchUploadAvatar } from "#src/api/user";
 import { useUserStore } from "#src/store/user";
 import { CameraOutlined } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import { Avatar, Button, Modal, Upload, message } from "antd";
+import { Avatar, Button, message, Modal, Upload } from "antd";
 import { useState } from "react";
 
 interface UploadAvatarModalProps {
-	open: boolean;
-	onClose: () => void;
+	open: boolean
+	onClose: () => void
 }
 
 export function UploadAvatarModal({ open, onClose }: UploadAvatarModalProps) {
@@ -29,7 +28,7 @@ export function UploadAvatarModal({ open, onClose }: UploadAvatarModalProps) {
 			}
 			const uploadResult = await fetchUploadAvatar(file);
 			// Update user with new avatar
-			const updateResult = await fetchUpdateUser(parseInt(userId), {
+			const updateResult = await fetchUpdateUser(Number.parseInt(userId), {
 				username,
 				email,
 				phone: phoneNumber,

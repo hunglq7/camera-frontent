@@ -5,11 +5,11 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DetailProps {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-	title: string;
-	detailData: Partial<TonghopCameraItemType>;
-	onFinish: (values: TonghopCameraItemType) => Promise<void>;
+	open: boolean
+	setOpen: (open: boolean) => void
+	title: string
+	detailData: Partial<TonghopCameraItemType>
+	onFinish: (values: TonghopCameraItemType) => Promise<void>
 }
 
 export function Detail({ open, setOpen, title, detailData, onFinish }: DetailProps) {
@@ -20,7 +20,8 @@ export function Detail({ open, setOpen, title, detailData, onFinish }: DetailPro
 		if (open) {
 			if (detailData.id) {
 				form.setFieldsValue(detailData);
-			} else {
+			}
+			else {
 				form.resetFields();
 			}
 		}
